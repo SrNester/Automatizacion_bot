@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 import json
@@ -12,6 +12,7 @@ from ..core.config import settings
 from ..services.ai_assistant import AIAssistant
 from ..services.integrations.hubspot_service import HubSpotService
 from ..services.integrations.whatsapp_service import WhatsAppService
+from ..services.conversation_manager import ConversationManager
 from ..services.lead_scoring import LeadScoringService
 from ..models.lead import Lead
 from ..models.interaction import Interaction

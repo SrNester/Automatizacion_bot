@@ -2,6 +2,7 @@ from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 from .integrations.hubspot_service import HubSpotService
 from ..models.lead import Lead, LeadStatus
+import requests
 
 class HubSpotEmailAutomation:
     def __init__(self):

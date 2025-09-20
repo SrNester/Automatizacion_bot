@@ -4,6 +4,7 @@ import openai
 from sqlalchemy.orm import Session
 from ..models.lead import Lead, LeadStatus
 from ..core.config import settings
+from datetime import datetime
 
 class LeadScoringService:
     def __init__(self):

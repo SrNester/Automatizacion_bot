@@ -5,6 +5,7 @@ from .core.database import get_db
 from .services.lead_scoring import LeadScoringService
 from .services.ai_assistant import AIAssistant
 from .services.nurturing import NurturingService
+from .services.lead_service import get_lead
 
 app = FastAPI(title="Sales Automation Bot", version="1.0.0")
 
