@@ -154,17 +154,18 @@ class AutomatedReportingService:
             }
         }
     
-    async def generate_weekly_# Sistema de Automatización de Ventas con IA
+    # async def generate_weekly_
+    # Sistema de Automatización de Ventas con IA
 
 ## 📋 Arquitectura del Sistema
 
 ### Stack Tecnológico Recomendado
-- **Backend**: Python (FastAPI)
-- **Base de Datos**: PostgreSQL + Redis (cache)
-- **IA/ML**: OpenAI API, scikit-learn
-- **Queue System**: Celery + RabbitMQ
-- **Frontend**: React.js
-- **Notificaciones**: Twilio (SMS/WhatsApp), SendGrid (Email)
-- **CRM Integration**: Pipedrive/HubSpot API
+# - **Backend**: Python (FastAPI)
+# - **Base de Datos**: PostgreSQL + Redis (cache)
+# - **IA/ML**: OpenAI API, scikit-learn
+# - **Queue System**: Celery + RabbitMQ
+# - **Frontend**: React.js
+# - **Notificaciones**: Twilio (SMS/WhatsApp), SendGrid (Email)
+# - **CRM Integration**: Pipedrive/HubSpot API
 
 ## 🏗️ Estructura de Módulos
