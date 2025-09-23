@@ -20,7 +20,7 @@ class CRMProvider(str, Enum):
 
 class SyncDirection(str, Enum):
     PUSH = "push"  # Internal → CRM
-    PULL = "pull"  # CRM → Internal
+    PULL = "pull"  # CRM → Internal, 
     BIDIRECTIONAL = "bidirectional"
 
 class SyncStatus(str, Enum):

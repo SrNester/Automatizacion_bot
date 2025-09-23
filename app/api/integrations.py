@@ -23,6 +23,47 @@ pipedrive_service = PipedriveService()
 hubspot_service = HubSpotService()
 
 # =============================================================================
+# UTILITY FUNCTIONS (MOVIDAS AL INICIO)
+# =============================================================================
+
+async def test_integration_connection(provider: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    """Testa la conexión con una integración específica"""
+    
+    try:
+        if provider == "meta_ads":
+            # Configurar temporalmente el servicio con la config
+            service = MetaAdsService()
+            service.access_token = config.get("access_token")
+            service.app_secret = config.get("app_secret")
+            service.ad_account_id = config.get("ad_account_id")
+            
+            return await service.health_check()
+            
+        elif provider == "pipedrive":
+            service = PipedriveService()
+            service.api_token = config.get("api_token")
+            
+            return await service.health_check()
+            
+        elif provider == "hubspot":
+            service = HubSpotService()
+            # Configurar con datos de config
+            
+            return await service.health_check()
+            
+        else:
+            return {
+                "success": False,
+                "error": f"Provider {provider} no soportado para health check"
+            }
+            
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+# =============================================================================
 # PYDANTIC MODELS
 # =============================================================================
 
@@ -43,6 +84,53 @@ class WebhookSetupRequest(BaseModel):
     provider: str
     webhook_url: str
     events: Optional[List[str]] = None
+
+# =============================================================================
+# INTEGRATION MANAGEMENT ENDPOINTS
+# =============================================================================
+
+@router.post("/integrations/", response_model=Dict[str, Any])
+async def create_integration(
+    integration_data: IntegrationCreateRequest,
+    db: Session = Depends(get_db)
+):
+    """Crea una nueva integración"""
+    
+    try:
+        # Crear integración
+        integration = Integration(
+            provider=integration_data.provider,
+            name=integration_data.name,
+            description=integration_data.description,
+            config=integration_data.config,
+            is_active=integration_data.is_active,
+            created_by="api"
+        )
+        
+        db.add(integration)
+        db.commit()
+        db.refresh(integration)
+        
+        # Test de conexión inicial
+        health_status = await test_integration_connection(integration.provider, integration.config)
+        
+        integration.health_status = "healthy" if health_status.get("success") else "unhealthy"
+        integration.last_health_check = datetime.utcnow()
+        
+        if not health_status.get("success"):
+            integration.last_error = health_status.get("error", "Connection test failed")
+        
+        db.commit()
+        
+        return {
+            "success": True,
+            "integration_id": integration.id,
+            "health_status": health_status,
+            "message": f"Integración '{integration.name}' creada exitosamente"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creando integración: {str(e)}")
 
 # =============================================================================
 # INTEGRATION MANAGEMENT ENDPOINTS

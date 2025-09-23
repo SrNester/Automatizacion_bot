@@ -1,13 +1,21 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+
+from app.models.lead import Lead
+from app.services.integrations import hubspot_service
 from .core.database import get_db
 from .services.lead_scoring import LeadScoringService
-from .services.ai_assistant import AIAssistant
+from .services.ai_assistant import AIAssistant, get_conversation_history
 from .services.nurturing import NurturingService
-from .services.lead_service import get_lead
+from .services.lead_service import calculate_conversion_rate, get_hot_leads_count, get_lead, get_top_lead_sources, get_total_leads, lead_dict, create_lead, save_interaction, get_interactions
+from .api.dashboard import router as dashboard_router
+from .api.reports import router as reports_router
 
 app = FastAPI(title="Sales Automation Bot", version="1.0.0")
+app.include_router(webhooks_router)
+app.include_router(dashboard_router)
+app.include_router(reports_router)
 
 app.add_middleware(
     CORSMiddleware,

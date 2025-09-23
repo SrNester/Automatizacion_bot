@@ -14,7 +14,7 @@ from ..services.integrations.hubspot_service import HubSpotService
 from ..services.integrations.whatsapp_service import WhatsAppService
 from ..services.conversation_manager import ConversationManager
 from ..services.lead_scoring import LeadScoringService
-from ..models.lead import Lead
+from ..models.integration import Lead
 from ..models.interaction import Interaction
 
 router = APIRouter()

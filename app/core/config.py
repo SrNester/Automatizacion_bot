@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     HUBSPOT_CLIENT_SECRET: str = os.getenv("HUBSPOT_CLIENT_SECRET", "")
     HUBSPOT_CLIENT_ID: str = os.getenv("HUBSPOT_CLIENT_ID", "")
     
-    # Meta Ads API (para Fase 4)
+    # Meta Ads API (Fase 4)
     META_ACCESS_TOKEN: str = os.getenv("META_ACCESS_TOKEN", "")
     META_APP_SECRET: str = os.getenv("META_APP_SECRET", "")
     META_AD_ACCOUNT_ID: str = os.getenv("META_AD_ACCOUNT_ID", "")
@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     # Redis (para cache y sesiones)
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     
-    # Email (SendGrid para Fase 3)
+    # Email (SendGrid Fase 3)
     SENDGRID_API_KEY: str = os.getenv("SENDGRID_API_KEY", "")
     FROM_EMAIL: str = os.getenv("FROM_EMAIL", "noreply@tudominio.com")
     
@@ -95,7 +95,7 @@ def validate_config():
     if not settings.OPENAI_API_KEY:
         missing_vars.append("OPENAI_API_KEY requerido para AI Assistant")
     
-    # WhatsApp (opcional pero recomendado para Fase 2)
+    # WhatsApp (opcional Fase 2)
     whatsapp_vars = [
         "WHATSAPP_ACCESS_TOKEN",
         "WHATSAPP_PHONE_NUMBER_ID", 
@@ -214,7 +214,7 @@ def get_environment_config(env: str = "development") -> dict:
         "development": {
             "DEBUG": True,
             "LOG_LEVEL": "DEBUG",
-            "WEBHOOK_VALIDATION": False,  # Desactivar validación para testing
+            "WEBHOOK_VALIDATION": False,  # Desactivar para testing
         },
         "staging": {
             "DEBUG": False,
