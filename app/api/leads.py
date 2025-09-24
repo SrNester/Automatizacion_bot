@@ -5,7 +5,8 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta
 
 from ..core.database import get_db
-from ..models.lead import Lead, LeadStatus, Interaction
+from ..models.integration import Lead, LeadStatus
+from ..models.interaction import Interaction
 from ..services.lead_service import LeadService
 from ..services.lead_scoring import LeadScoringService
 from ..services.lead_segmentation import LeadSegmentationService

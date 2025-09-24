@@ -19,8 +19,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.chart import LineChart, BarChart, Reference
 
-from ...core.config import settings
-from ...services.analytics.analytics_engine import AnalyticsEngine
+from ..core.config import settings
+from ..services.analytics.analytics_engine import AnalyticsEngine
 
 class ReportGenerator:
     """Generador de reportes en múltiples formatos (PDF, Excel, HTML)"""

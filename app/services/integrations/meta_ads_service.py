@@ -8,9 +8,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from ...core.config import settings
-from ...core.database import get_db
-from ...models.lead import Lead
-from ...models.integration import Integration, ExternalLead, SyncLog
+from ...models.integration import Lead, Integration, ExternalLead, SyncLog, SyncStatus
 from ...services.lead_scoring import LeadScoringService
 from ...services.workflow_engine import WorkflowEngine, TriggerType
 
@@ -171,11 +169,8 @@ class MetaAdsService:
             print(f"❌ Excepción obteniendo leads: {e}")
             return []
     
-    async def process_webhook_lead(self, webhook_data: Dict[str, Any], db: Session = None) -> Dict[str, Any]:
+    async def process_webhook_lead(self, webhook_data: Dict[str, Any], db: Session) -> Dict[str, Any]:
         """Procesa un lead recibido via webhook"""
-        
-        if not db:
-            db = next(get_db())
         
         try:
             # Extraer datos del webhook
@@ -267,30 +262,24 @@ class MetaAdsService:
             # Crear nuevo lead
             lead_score = await self._calculate_meta_lead_score(mapped_data, form_id, ad_id)
             
+            # Construir nombre completo
+            name = mapped_data.get('name') or f"{mapped_data.get('first_name', '')} {mapped_data.get('last_name', '')}".strip()
+            
             new_lead = Lead(
-                name=mapped_data.get('name') or f"{mapped_data.get('first_name', '')} {mapped_data.get('last_name', '')}".strip(),
                 email=email,
+                name=name,
                 phone=self._normalize_phone(phone) if phone else None,
                 company=mapped_data.get('company'),
+                job_title=mapped_data.get('job_title'),
                 source='meta_ads',
-                status='new',
+                status='cold',  # Usar el enum correcto
                 score=lead_score,
-                metadata={
-                    'meta_leadgen_id': meta_lead_data.get('id'),
-                    'meta_form_id': form_id,
-                    'meta_ad_id': ad_id,
-                    'meta_created_time': meta_lead_data.get('created_time'),
-                    'original_fields': mapped_data,
-                    'utm_source': 'facebook',
-                    'utm_medium': 'lead_ad'
-                },
-                created_at=datetime.utcnow()
+                first_interaction=datetime.utcnow(),
+                last_interaction=datetime.utcnow(),
+                is_active=True,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
             )
-            
-            # Agregar campos adicionales
-            for field, value in mapped_data.items():
-                if hasattr(new_lead, field) and value:
-                    setattr(new_lead, field, value)
             
             db.add(new_lead)
             db.commit()
@@ -302,9 +291,10 @@ class MetaAdsService:
                 external_id=meta_lead_data.get('id'),
                 external_source='meta_ads',
                 external_form_id=form_id,
-                external_campaign_id=ad_id,
+                external_ad_id=ad_id,
                 raw_data=meta_lead_data,
-                processed_at=datetime.utcnow()
+                processed_at=datetime.utcnow(),
+                created_at=datetime.utcnow()
             )
             
             db.add(external_lead)
@@ -315,8 +305,10 @@ class MetaAdsService:
                 operation='create_lead',
                 external_id=meta_lead_data.get('id'),
                 internal_id=new_lead.id,
-                status='success',
-                details={'mapped_fields': len(mapped_data), 'lead_score': lead_score}
+                status=SyncStatus.COMPLETED,
+                details={'mapped_fields': len(mapped_data), 'lead_score': lead_score},
+                started_at=datetime.utcnow(),
+                completed_at=datetime.utcnow()
             )
             
             db.add(sync_log)
@@ -338,14 +330,16 @@ class MetaAdsService:
                     integration_type='meta_ads',
                     operation='create_lead',
                     external_id=meta_lead_data.get('id'),
-                    status='failed',
-                    error_message=str(e)
+                    status=SyncStatus.FAILED,
+                    error_message=str(e),
+                    started_at=datetime.utcnow(),
+                    completed_at=datetime.utcnow()
                 )
                 db.add(sync_log)
                 db.commit()
             
             return None
-    
+
     def _map_meta_fields(self, field_data: List[Dict]) -> Dict[str, Any]:
         """Mapea campos de Meta a campos internos"""
         
@@ -380,10 +374,10 @@ class MetaAdsService:
         
         return mapped_data
     
-    async def _calculate_meta_lead_score(self, mapped_data: Dict, form_id: str, ad_id: str) -> int:
+    async def _calculate_meta_lead_score(self, mapped_data: Dict, form_id: str, ad_id: str) -> float:
         """Calcula score inicial para lead de Meta Ads"""
         
-        base_score = 35  # Score base para leads de Meta Ads
+        base_score = 35.0  # Score base para leads de Meta Ads
         
         # Bonus por tener información completa
         if mapped_data.get('email'):
@@ -402,7 +396,7 @@ class MetaAdsService:
         additional_fields = len([v for v in mapped_data.values() if v and str(v).strip()])
         base_score += min(additional_fields * 2, 15)  # Max 15 puntos por campos adicionales
         
-        return min(base_score, 100)
+        return min(base_score, 100.0)
     
     def _normalize_phone(self, phone: str) -> str:
         """Normaliza número de teléfono"""
@@ -434,15 +428,8 @@ class MetaAdsService:
         
         # Aumentar score por re-engagement
         if updated_fields:
-            lead.score = min(lead.score + 5, 100)
+            lead.score = min(lead.score + 5, 100) if lead.score else 40.0
             lead.updated_at = datetime.utcnow()
-        
-        # Actualizar metadata
-        if not lead.metadata:
-            lead.metadata = {}
-        
-        lead.metadata['last_meta_interaction'] = datetime.utcnow().isoformat()
-        lead.metadata['meta_reengagement_count'] = lead.metadata.get('meta_reengagement_count', 0) + 1
         
         db.commit()
         
@@ -473,9 +460,6 @@ class MetaAdsService:
                                   batch_size: int = 50,
                                   db: Session = None) -> Dict[str, int]:
         """Sincroniza leads históricos de Meta Ads"""
-        
-        if not db:
-            db = next(get_db())
         
         results = {
             "total_processed": 0,
@@ -603,28 +587,6 @@ class MetaAdsService:
             print(f"❌ Error obteniendo métricas de campaña {campaign_id}: {e}")
             return {"error": str(e)}
     
-    async def get_all_campaign_metrics(self, date_preset: str = "last_7d") -> List[Dict[str, Any]]:
-        """Obtiene métricas de todas las campañas activas"""
-        
-        campaigns = await self.get_campaigns()
-        all_metrics = []
-        
-        for campaign in campaigns:
-            campaign_id = campaign["id"]
-            campaign_name = campaign.get("name", "Unknown")
-            
-            metrics = await self.get_campaign_metrics(campaign_id, date_preset)
-            
-            if "error" not in metrics:
-                metrics["campaign_name"] = campaign_name
-                metrics["campaign_status"] = campaign.get("status")
-                all_metrics.append(metrics)
-            
-            # Pausa para no saturar la API
-            await asyncio.sleep(0.5)
-        
-        return all_metrics
-    
     async def verify_webhook_signature(self, payload: str, signature: str) -> bool:
         """Verifica la firma del webhook de Meta"""
         
@@ -677,318 +639,3 @@ class MetaAdsService:
                 "error": str(e),
                 "timestamp": datetime.utcnow().isoformat()
             }
-    
-    async def create_test_webhook_subscription(self) -> Dict[str, Any]:
-        """Crea una suscripción de webhook para testing"""
-        
-        # Esta función es útil para desarrollo y testing
-        webhook_url = f"{settings.APP_BASE_URL}/api/v1/webhooks/meta-ads"
-        
-        return await self.setup_webhooks(webhook_url)
-    
-    async def get_webhook_subscriptions(self) -> List[Dict[str, Any]]:
-        """Obtiene suscripciones de webhook actuales"""
-        
-        url = f"{self.base_url}/me/subscriptions"
-        params = {
-            "access_token": self.access_token
-        }
-        
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, params=params) as response:
-                    result = await response.json()
-                    
-                    if "data" in result:
-                        return result["data"]
-                    else:
-                        return []
-                        
-        except Exception as e:
-            print(f"❌ Error obteniendo suscripciones de webhook: {e}")
-            return []
-    
-    async def delete_webhook_subscription(self, subscription_id: str) -> Dict[str, Any]:
-        """Elimina una suscripción de webhook"""
-        
-        url = f"{self.base_url}/{subscription_id}"
-        params = {
-            "access_token": self.access_token
-        }
-        
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.delete(url, params=params) as response:
-                    if response.status == 200:
-                        return {"success": True, "message": "Webhook eliminado exitosamente"}
-                    else:
-                        result = await response.json()
-                        return {"success": False, "error": result}
-                        
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    async def create_custom_audience(self, 
-                                   name: str,
-                                   description: str,
-                                   emails: List[str]) -> Dict[str, Any]:
-        """Crea una audiencia personalizada con emails de leads"""
-        
-        url = f"{self.base_url}/{self.ad_account_id}/customaudiences"
-        
-        # Hash emails para privacidad
-        hashed_emails = [hashlib.sha256(email.lower().encode()).hexdigest() for email in emails]
-        
-        audience_data = {
-            "name": name,
-            "description": description,
-            "subtype": "CUSTOM",
-            "customer_file_source": "USER_PROVIDED_ONLY",
-            "access_token": self.access_token
-        }
-        
-        try:
-            async with aiohttp.ClientSession() as session:
-                # Crear audiencia
-                async with session.post(url, data=audience_data) as response:
-                    result = await response.json()
-                    
-                    if "id" in result:
-                        audience_id = result["id"]
-                        
-                        # Agregar usuarios a la audiencia
-                        users_url = f"{self.base_url}/{audience_id}/users"
-                        users_data = {
-                            "payload": {
-                                "schema": ["EMAIL_SHA256"],
-                                "data": [[email] for email in hashed_emails]
-                            },
-                            "access_token": self.access_token
-                        }
-                        
-                        async with session.post(users_url, json=users_data) as users_response:
-                            users_result = await users_response.json()
-                            
-                            return {
-                                "success": True,
-                                "audience_id": audience_id,
-                                "audience_name": name,
-                                "users_added": len(emails),
-                                "details": users_result
-                            }
-                    else:
-                        return {"success": False, "error": result}
-                        
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    async def sync_leads_to_crm(self, lead_ids: List[int], crm_type: str, db: Session = None):
-        """Sincroniza leads específicos con CRM externo"""
-        
-        if not db:
-            db = next(get_db())
-        
-        # Esta función se integrará con el CRM Sync Manager
-        from .crm_sync_manager import CRMSyncManager
-        
-        crm_manager = CRMSyncManager()
-        
-        results = []
-        
-        for lead_id in lead_ids:
-            lead = db.query(Lead).filter(Lead.id == lead_id).first()
-            
-            if lead and lead.source == 'meta_ads':
-                try:
-                    sync_result = await crm_manager.sync_lead_to_crm(lead, crm_type, db)
-                    results.append({
-                        "lead_id": lead_id,
-                        "email": lead.email,
-                        "success": sync_result.get("success", False),
-                        "crm_id": sync_result.get("crm_id")
-                    })
-                    
-                except Exception as e:
-                    results.append({
-                        "lead_id": lead_id,
-                        "email": lead.email if lead else "Unknown",
-                        "success": False,
-                        "error": str(e)
-                    })
-        
-        return {
-            "total_processed": len(results),
-            "successful": len([r for r in results if r["success"]]),
-            "failed": len([r for r in results if not r["success"]]),
-            "details": results
-        }
-    
-    async def get_attribution_report(self, 
-                                   days: int = 30,
-                                   db: Session = None) -> Dict[str, Any]:
-        """Genera reporte de atribución para leads de Meta Ads"""
-        
-        if not db:
-            db = next(get_db())
-        
-        since_date = datetime.utcnow() - timedelta(days=days)
-        
-        # Obtener leads de Meta Ads
-        meta_leads = db.query(Lead)\
-            .filter(Lead.source == 'meta_ads')\
-            .filter(Lead.created_at > since_date)\
-            .all()
-        
-        # Obtener métricas de campañas
-        campaign_metrics = await self.get_all_campaign_metrics("last_30d")
-        
-        # Calcular attribution
-        total_leads_db = len(meta_leads)
-        total_leads_meta = sum(metrics.get("leads", 0) for metrics in campaign_metrics)
-        total_spend = sum(metrics.get("spend", 0) for metrics in campaign_metrics)
-        
-        # Leads por score range
-        score_distribution = {
-            "0-25": len([l for l in meta_leads if l.score <= 25]),
-            "26-50": len([l for l in meta_leads if 26 <= l.score <= 50]),
-            "51-75": len([l for l in meta_leads if 51 <= l.score <= 75]),
-            "76-100": len([l for l in meta_leads if l.score >= 76])
-        }
-        
-        # Qualified leads (score >= 50)
-        qualified_leads = len([l for l in meta_leads if l.score >= 50])
-        qualification_rate = qualified_leads / total_leads_db if total_leads_db > 0 else 0
-        
-        # Cost per qualified lead
-        cost_per_qualified = total_spend / qualified_leads if qualified_leads > 0 else 0
-        
-        return {
-            "period_days": days,
-            "summary": {
-                "total_leads_captured": total_leads_db,
-                "total_leads_reported_by_meta": total_leads_meta,
-                "attribution_accuracy": total_leads_db / total_leads_meta if total_leads_meta > 0 else 0,
-                "total_spend": total_spend,
-                "cost_per_lead": total_spend / total_leads_db if total_leads_db > 0 else 0,
-                "cost_per_qualified_lead": cost_per_qualified
-            },
-            "lead_quality": {
-                "qualified_leads": qualified_leads,
-                "qualification_rate": qualification_rate,
-                "score_distribution": score_distribution,
-                "avg_score": sum(l.score for l in meta_leads) / len(meta_leads) if meta_leads else 0
-            },
-            "campaign_performance": campaign_metrics,
-            "generated_at": datetime.utcnow().isoformat()
-        }
-    
-    async def cleanup_old_external_leads(self, days_to_keep: int = 90, db: Session = None):
-        """Limpia registros antiguos de external leads para mantener performance"""
-        
-        if not db:
-            db = next(get_db())
-        
-        cutoff_date = datetime.utcnow() - timedelta(days=days_to_keep)
-        
-        # Eliminar external leads antiguos
-        old_external_leads = db.query(ExternalLead)\
-            .filter(ExternalLead.processed_at < cutoff_date)\
-            .filter(ExternalLead.external_source == 'meta_ads')\
-            .count()
-        
-        db.query(ExternalLead)\
-            .filter(ExternalLead.processed_at < cutoff_date)\
-            .filter(ExternalLead.external_source == 'meta_ads')\
-            .delete()
-        
-        # Eliminar sync logs antiguos
-        old_sync_logs = db.query(SyncLog)\
-            .filter(SyncLog.created_at < cutoff_date)\
-            .filter(SyncLog.integration_type == 'meta_ads')\
-            .count()
-        
-        db.query(SyncLog)\
-            .filter(SyncLog.created_at < cutoff_date)\
-            .filter(SyncLog.integration_type == 'meta_ads')\
-            .delete()
-        
-        db.commit()
-        
-        print(f"🧹 Cleanup Meta Ads: {old_external_leads} external leads, {old_sync_logs} sync logs eliminados")
-        
-        return {
-            "deleted_external_leads": old_external_leads,
-            "deleted_sync_logs": old_sync_logs
-        }
-
-# Funciones de utilidad para Meta Ads
-
-async def batch_process_meta_leads(lead_ids: List[str], 
-                                 batch_size: int = 20,
-                                 db: Session = None) -> Dict[str, Any]:
-    """Procesa leads de Meta en lotes para mejor performance"""
-    
-    meta_service = MetaAdsService()
-    
-    results = {
-        "total_leads": len(lead_ids),
-        "processed": 0,
-        "successful": 0,
-        "failed": 0,
-        "errors": []
-    }
-    
-    # Procesar en lotes
-    for i in range(0, len(lead_ids), batch_size):
-        batch = lead_ids[i:i + batch_size]
-        
-        for lead_id in batch:
-            try:
-                lead_data = await meta_service.get_lead_details(lead_id)
-                
-                if lead_data:
-                    processed_lead = await meta_service.create_lead_from_meta(
-                        lead_data, None, None, db
-                    )
-                    
-                    if processed_lead:
-                        results["successful"] += 1
-                    else:
-                        results["failed"] += 1
-                else:
-                    results["failed"] += 1
-                
-                results["processed"] += 1
-                
-            except Exception as e:
-                results["failed"] += 1
-                results["errors"].append({"lead_id": lead_id, "error": str(e)})
-        
-        # Pausa entre lotes
-        await asyncio.sleep(2)
-    
-    return results
-
-def validate_meta_webhook_data(webhook_data: Dict[str, Any]) -> bool:
-    """Valida que los datos del webhook de Meta están completos"""
-    
-    required_fields = ['entry']
-    
-    for field in required_fields:
-        if field not in webhook_data:
-            return False
-    
-    entry = webhook_data.get('entry', [])
-    if not entry or not isinstance(entry, list):
-        return False
-    
-    for entry_item in entry:
-        if 'changes' not in entry_item:
-            return False
-        
-        changes = entry_item.get('changes', [])
-        for change in changes:
-            if change.get('field') == 'leadgen' and 'value' in change:
-                return True
-    
-    return False

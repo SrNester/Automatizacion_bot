@@ -1,9 +1,11 @@
-import requests
-from typing import Dict, List, Optional
-from datetime import datetime
+import aiohttp
 import json
+from typing import Dict, List, Optional, Any
+from datetime import datetime
+
 from ...core.config import settings
-from ...models.lead import Lead, Interaction
+from ...models.integration import Lead
+from ...models.interaction import Interaction
 
 class HubSpotService:
     def __init__(self):
@@ -14,36 +16,37 @@ class HubSpotService:
             "Content-Type": "application/json"
         }
     
-    # CONTACTS - Gestión de Contactos
-    async def create_or_update_contact(self, lead: Lead) -> Dict:
-        """Crea o actualiza un contacto en HubSpot"""
+    async def health_check(self) -> Dict[str, Any]:
+        """Verifica el estado de la conexión con HubSpot"""
         
-        # Buscar si el contacto ya existe
-        existing_contact = await self.find_contact_by_email(lead.email)
+        url = f"{self.base_url}/crm/v3/objects/contacts"
+        params = {"limit": 1}
         
-        contact_data = self._build_contact_properties(lead)
-        
-        if existing_contact:
-            # Actualizar contacto existente
-            contact_id = existing_contact['id']
-            response = await self._update_contact(contact_id, contact_data)
-            action = "updated"
-        else:
-            # Crear nuevo contacto
-            response = await self._create_contact(contact_data)
-            action = "created"
-        
-        # Guardar HubSpot ID en nuestro sistema
-        if response and 'id' in response:
-            lead.hubspot_id = response['id']
-            
-        return {
-            "action": action,
-            "hubspot_id": response.get('id') if response else None,
-            "success": response is not None
-        }
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=self.headers, params=params) as response:
+                    if response.status == 200:
+                        return {
+                            "status": "healthy",
+                            "provider": "hubspot",
+                            "timestamp": datetime.utcnow().isoformat()
+                        }
+                    else:
+                        return {
+                            "status": "unhealthy",
+                            "error": f"HTTP {response.status}",
+                            "provider": "hubspot",
+                            "timestamp": datetime.utcnow().isoformat()
+                        }
+        except Exception as e:
+            return {
+                "status": "unhealthy",
+                "error": str(e),
+                "provider": "hubspot",
+                "timestamp": datetime.utcnow().isoformat()
+            }
     
-    async def find_contact_by_email(self, email: str) -> Optional[Dict]:
+    async def find_contact_by_email(self, email: str) -> Dict[str, Any]:
         """Busca un contacto por email en HubSpot"""
         
         url = f"{self.base_url}/crm/v3/objects/contacts/search"
@@ -56,86 +59,178 @@ class HubSpotService:
                     "value": email
                 }]
             }],
-            "properties": ["email", "firstname", "lastname", "company", "jobtitle"]
+            "properties": ["email", "firstname", "lastname", "company", "phone", "lifecyclestage"]
         }
         
         try:
-            response = requests.post(url, headers=self.headers, json=search_data)
-            
-            if response.status_code == 200:
-                results = response.json()
-                return results['results'][0] if results['results'] else None
-            
-            return None
-            
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=self.headers, json=search_data) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        contacts = result.get('results', [])
+                        if contacts:
+                            return {
+                                "success": True,
+                                "contact": contacts[0]
+                            }
+                        else:
+                            return {
+                                "success": True,
+                                "contact": None
+                            }
+                    else:
+                        return {
+                            "success": False,
+                            "error": f"HTTP {response.status}"
+                        }
         except Exception as e:
-            print(f"Error buscando contacto: {e}")
-            return None
+            return {
+                "success": False,
+                "error": str(e)
+            }
     
-    async def _create_contact(self, properties: Dict) -> Optional[Dict]:
+    async def find_contact_by_phone(self, phone: str) -> Dict[str, Any]:
+        """Busca un contacto por teléfono en HubSpot"""
+        
+        url = f"{self.base_url}/crm/v3/objects/contacts/search"
+        
+        search_data = {
+            "filterGroups": [{
+                "filters": [{
+                    "propertyName": "phone",
+                    "operator": "EQ",
+                    "value": phone
+                }]
+            }],
+            "properties": ["email", "firstname", "lastname", "company", "phone", "lifecyclestage"]
+        }
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=self.headers, json=search_data) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        contacts = result.get('results', [])
+                        if contacts:
+                            return {
+                                "success": True,
+                                "contact": contacts[0]
+                            }
+                        else:
+                            return {
+                                "success": True,
+                                "contact": None
+                            }
+                    else:
+                        return {
+                            "success": False,
+                            "error": f"HTTP {response.status}"
+                        }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    async def create_contact(self, contact_data: Dict[str, Any]) -> Dict[str, Any]:
         """Crea un nuevo contacto en HubSpot"""
         
         url = f"{self.base_url}/crm/v3/objects/contacts"
         
-        contact_data = {"properties": properties}
+        # Preparar propiedades para HubSpot
+        properties = {}
+        for key, value in contact_data.items():
+            if value is not None:
+                properties[key] = str(value)
+        
+        payload = {
+            "properties": properties
+        }
         
         try:
-            response = requests.post(url, headers=self.headers, json=contact_data)
-            
-            if response.status_code == 201:
-                return response.json()
-            else:
-                print(f"Error creando contacto: {response.status_code} - {response.text}")
-                return None
-                
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=self.headers, json=payload) as response:
+                    if response.status == 201:
+                        result = await response.json()
+                        return {
+                            "success": True,
+                            "contact_id": result.get('id'),
+                            "data": result
+                        }
+                    else:
+                        error_text = await response.text()
+                        return {
+                            "success": False,
+                            "error": f"HTTP {response.status}: {error_text}"
+                        }
         except Exception as e:
-            print(f"Error en API de HubSpot: {e}")
-            return None
+            return {
+                "success": False,
+                "error": str(e)
+            }
     
-    async def _update_contact(self, contact_id: str, properties: Dict) -> Optional[Dict]:
+    async def update_contact(self, contact_id: str, contact_data: Dict[str, Any]) -> Dict[str, Any]:
         """Actualiza un contacto existente en HubSpot"""
         
         url = f"{self.base_url}/crm/v3/objects/contacts/{contact_id}"
         
-        update_data = {"properties": properties}
+        # Preparar propiedades para HubSpot
+        properties = {}
+        for key, value in contact_data.items():
+            if value is not None:
+                properties[key] = str(value)
+        
+        payload = {
+            "properties": properties
+        }
         
         try:
-            response = requests.patch(url, headers=self.headers, json=update_data)
-            
-            if response.status_code == 200:
-                return response.json()
-            else:
-                print(f"Error actualizando contacto: {response.status_code}")
-                return None
-                
+            async with aiohttp.ClientSession() as session:
+                async with session.patch(url, headers=self.headers, json=payload) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        return {
+                            "success": True,
+                            "contact_id": contact_id,
+                            "data": result
+                        }
+                    else:
+                        error_text = await response.text()
+                        return {
+                            "success": False,
+                            "error": f"HTTP {response.status}: {error_text}"
+                        }
         except Exception as e:
-            print(f"Error actualizando contacto: {e}")
-            return None
+            return {
+                "success": False,
+                "error": str(e)
+            }
     
-    def _build_contact_properties(self, lead: Lead) -> Dict:
+    def _build_contact_properties(self, lead: Lead) -> Dict[str, str]:
         """Construye las propiedades del contacto para HubSpot"""
         
+        # Dividir nombre si es necesario
+        first_name = ""
+        last_name = ""
+        if lead.name:
+            name_parts = lead.name.split(' ', 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ""
+        
         properties = {
-            "email": lead.email,
-            "firstname": lead.name.split()[0] if lead.name else "",
-            "lastname": " ".join(lead.name.split()[1:]) if lead.name and len(lead.name.split()) > 1 else "",
+            "email": lead.email or "",
+            "firstname": first_name,
+            "lastname": last_name,
             "phone": lead.phone or "",
             "company": lead.company or "",
             "jobtitle": lead.job_title or "",
-            
-            # Propiedades personalizadas
-            "lead_score": str(lead.score),
-            "lead_status": lead.status,
-            "lead_source": lead.source or "",
-            "utm_campaign": lead.utm_campaign or "",
-            "first_interaction_date": lead.first_interaction.isoformat() if lead.first_interaction else "",
-            "budget_range": lead.budget_range or "",
-            "timeline": lead.timeline or "",
-            
-            # Campos calculados
-            "lifecycle_stage": self._map_lifecycle_stage(lead.status),
-            "ai_qualification_score": str(lead.score)
+            "lifecyclestage": self._map_lifecycle_stage(lead.status),
+            "hs_lead_source": lead.source or "api",
         }
+        
+        # Agregar score si existe
+        if lead.score is not None:
+            properties["hs_score"] = str(lead.score)
         
         return {k: v for k, v in properties.items() if v}  # Remover valores vacíos
     
@@ -150,205 +245,4 @@ class HubSpotService:
             "lost": "other"
         }
         
-        return mapping.get(lead_status, "subscriber")
-    
-    # DEALS - Gestión de Oportunidades
-    async def create_deal(self, lead: Lead, deal_data: Dict) -> Optional[Dict]:
-        """Crea una oportunidad en HubSpot"""
-        
-        # Primero asegurar que el contacto existe
-        contact_result = await self.create_or_update_contact(lead)
-        
-        if not contact_result['success']:
-            return None
-        
-        url = f"{self.base_url}/crm/v3/objects/deals"
-        
-        properties = {
-            "dealname": deal_data.get('name', f"Oportunidad - {lead.name}"),
-            "amount": deal_data.get('amount', '0'),
-            "dealstage": deal_data.get('stage', 'appointmentscheduled'),
-            "pipeline": deal_data.get('pipeline', 'default'),
-            "closedate": deal_data.get('close_date', ''),
-            "deal_source": lead.source or '',
-            "lead_score_at_creation": str(lead.score)
-        }
-        
-        deal_payload = {"properties": properties}
-        
-        try:
-            response = requests.post(url, headers=self.headers, json=deal_payload)
-            
-            if response.status_code == 201:
-                deal = response.json()
-                
-                # Asociar deal con contacto
-                await self._associate_deal_to_contact(deal['id'], contact_result['hubspot_id'])
-                
-                return deal
-            else:
-                print(f"Error creando deal: {response.status_code}")
-                return None
-                
-        except Exception as e:
-            print(f"Error creando deal: {e}")
-            return None
-    
-    async def _associate_deal_to_contact(self, deal_id: str, contact_id: str):
-        """Asocia un deal con un contacto"""
-        
-        url = f"{self.base_url}/crm/v3/objects/deals/{deal_id}/associations/contacts/{contact_id}/deal_to_contact"
-        
-        try:
-            response = requests.put(url, headers=self.headers)
-            return response.status_code == 200
-        except Exception as e:
-            print(f"Error asociando deal a contacto: {e}")
-            return False
-    
-    # ACTIVITIES - Registro de Actividades
-    async def log_interaction(self, lead: Lead, interaction: Interaction) -> bool:
-        """Registra una interacción como actividad en HubSpot"""
-        
-        # Mapear tipo de interacción a tipo de actividad de HubSpot
-        activity_type = self._map_interaction_to_activity_type(interaction.type)
-        
-        if not activity_type:
-            return False
-        
-        # Obtener el contact_id de HubSpot
-        contact = await self.find_contact_by_email(lead.email)
-        if not contact:
-            return False
-        
-        url = f"{self.base_url}/crm/v3/objects/{activity_type}"
-        
-        properties = {
-            "hs_activity_type": activity_type,
-            "hs_timestamp": interaction.timestamp.isoformat(),
-            "subject": f"Interacción AI Bot - {interaction.type}",
-            "hs_body_preview": interaction.content[:200] if interaction.content else "",
-            "sentiment_score": str(interaction.sentiment_score) if interaction.sentiment_score else ""
-        }
-        
-        activity_data = {
-            "properties": properties,
-            "associations": [
-                {
-                    "to": {"id": contact['id']},
-                    "types": [{"associationCategory": "HUBSPOT_DEFINED", "associationTypeId": 1}]
-                }
-            ]
-        }
-        
-        try:
-            response = requests.post(url, headers=self.headers, json=activity_data)
-            return response.status_code == 201
-        except Exception as e:
-            print(f"Error registrando actividad: {e}")
-            return False
-    
-    def _map_interaction_to_activity_type(self, interaction_type: str) -> Optional[str]:
-        """Mapea tipos de interacción a tipos de actividad de HubSpot"""
-        
-        mapping = {
-            "email": "emails",
-            "call": "calls", 
-            "whatsapp": "communications",
-            "website_visit": "communications",
-            "download": "communications",
-            "chat": "communications"
-        }
-        
-        return mapping.get(interaction_type)
-    
-    # WEBHOOKS - Sincronización bidireccional
-    async def setup_webhooks(self) -> bool:
-        """Configura webhooks de HubSpot para sincronización bidireccional"""
-        
-        webhook_url = f"{settings.BASE_URL}/webhooks/hubspot"
-        
-        webhook_config = {
-            "subscriptions": [
-                {
-                    "subscriptionDetails": {
-                        "subscriptionType": "contact.propertyChange",
-                        "propertyName": "email"
-                    },
-                    "enabled": True
-                },
-                {
-                    "subscriptionDetails": {
-                        "subscriptionType": "deal.creation"
-                    },
-                    "enabled": True
-                },
-                {
-                    "subscriptionDetails": {
-                        "subscriptionType": "deal.propertyChange",
-                        "propertyName": "dealstage"
-                    },
-                    "enabled": True
-                }
-            ],
-            "webhookUrl": webhook_url
-        }
-        
-        url = f"{self.base_url}/webhooks/v3/{settings.HUBSPOT_APP_ID}/settings"
-        
-        try:
-            response = requests.put(url, headers=self.headers, json=webhook_config)
-            return response.status_code == 200
-        except Exception as e:
-            print(f"Error configurando webhooks: {e}")
-            return False
-    
-    # SYNC UTILITIES
-    async def sync_all_contacts(self, limit: int = 100) -> Dict:
-        """Sincroniza todos los contactos desde HubSpot"""
-        
-        url = f"{self.base_url}/crm/v3/objects/contacts"
-        
-        params = {
-            "limit": limit,
-            "properties": ["email", "firstname", "lastname", "company", "jobtitle", "phone"]
-        }
-        
-        try:
-            response = requests.get(url, headers=self.headers, params=params)
-            
-            if response.status_code == 200:
-                data = response.json()
-                contacts = data.get('results', [])
-                
-                sync_results = {
-                    "total_contacts": len(contacts),
-                    "synced": 0,
-                    "errors": 0
-                }
-                
-                for contact in contacts:
-                    try:
-                        # Convertir contacto de HubSpot a nuestro formato
-                        # y crear/actualizar en nuestra BD
-                        await self._sync_contact_to_local(contact)
-                        sync_results["synced"] += 1
-                    except Exception as e:
-                        print(f"Error sincronizando contacto {contact.get('id')}: {e}")
-                        sync_results["errors"] += 1
-                
-                return sync_results
-            
-            return {"error": "Failed to fetch contacts"}
-            
-        except Exception as e:
-            return {"error": f"Sync failed: {e}"}
-    
-    async def _sync_contact_to_local(self, hubspot_contact: Dict):
-        """Sincroniza un contacto de HubSpot a nuestra base de datos local"""
-        
-        properties = hubspot_contact.get('properties', {})
-        
-        # Aquí implementarías la lógica para crear/actualizar
-        # el lead en tu base de datos local basado en los datos de HubSpot
-        pass
+        return mapping.get(lead_status, "lead")

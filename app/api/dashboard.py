@@ -8,9 +8,9 @@ import json
 
 from ..core.database import get_db
 from ..services.analytics.analytics_engine import AnalyticsEngine
-from ..services.analytics.report_generator import ReportGenerator
+from ..services.report_generator import ReportGenerator
 from ..services.notifications.notification_service import NotificationService
-from ..models.lead import Lead 
+from ..models.integration import Lead 
 
 router = APIRouter()
 

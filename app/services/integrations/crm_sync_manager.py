@@ -4,31 +4,25 @@ from sqlalchemy.orm import Session
 from enum import Enum
 import asyncio
 import json
+import logging
 
-from ...core.config import settings
-from ...core.database import get_db
-from ...models.lead import Lead
-from ...models.integration import Integration, SyncLog, CRMSync
+# Importaciones corregidas según tu estructura real
+from ...models.integration import (
+    Lead, Integration, SyncLog, CRMSync, 
+    IntegrationProvider, SyncStatus, SyncDirection, LeadStatus
+)
 from .hubspot_service import HubSpotService
 from .pipedrive_service import PipedriveService
 from .salesforce_service import SalesforceService
+
+logger = logging.getLogger(__name__)
 
 class CRMProvider(str, Enum):
     HUBSPOT = "hubspot"
     PIPEDRIVE = "pipedrive"
     SALESFORCE = "salesforce"
-
-class SyncDirection(str, Enum):
-    PUSH = "push"  # Internal → CRM
-    PULL = "pull"  # CRM → Internal, 
-    BIDIRECTIONAL = "bidirectional"
-
-class SyncStatus(str, Enum):
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    PARTIAL = "partial"
+    ZOHO = "zoho"
+    MS_DYNAMICS = "ms_dynamics"
 
 class CRMSyncManager:
     """Orchestrador para sincronización con múltiples CRMs"""
@@ -48,9 +42,9 @@ class CRMSyncManager:
         self.conflict_resolution = {
             "default_strategy": "last_modified_wins",
             "field_priority": {
-                "email": "crm_wins",  # CRM siempre gana para email
-                "score": "internal_wins",  # Internal siempre gana para score
-                "phone": "most_complete_wins"  # El más completo gana
+                "email": "crm_wins",
+                "score": "internal_wins",
+                "phone": "most_complete_wins"
             }
         }
     
@@ -59,36 +53,33 @@ class CRMSyncManager:
         
         return {
             CRMProvider.HUBSPOT: {
-                # Internal → HubSpot
-                "name": "firstname",  # Se divide en firstname/lastname
+                "name": "firstname",
                 "email": "email",
                 "phone": "phone",
                 "company": "company",
                 "job_title": "jobtitle",
                 "source": "hs_lead_source",
-                "score": "hs_score",  # Campo personalizado
+                "score": "hs_score",
                 "status": "lifecyclestage"
             },
             CRMProvider.PIPEDRIVE: {
-                # Internal → Pipedrive
                 "name": "name",
                 "email": "email",
                 "phone": "phone",
                 "company": "org_name",
                 "job_title": "job_title",
-                "source": "lead_source",  # Campo personalizado
-                "score": "lead_score",  # Campo personalizado
+                "source": "lead_source",
+                "score": "lead_score",
                 "status": "status"
             },
             CRMProvider.SALESFORCE: {
-                # Internal → Salesforce
-                "name": "Name",  # Se divide en FirstName/LastName
+                "name": "Name",
                 "email": "Email",
-                "phone": "Phone", 
+                "phone": "Phone",
                 "company": "Company",
                 "job_title": "Title",
                 "source": "LeadSource",
-                "score": "Lead_Score__c",  # Campo personalizado
+                "score": "Lead_Score__c",
                 "status": "Status"
             }
         }
@@ -100,30 +91,28 @@ class CRMSyncManager:
                              db: Session = None) -> Dict[str, Any]:
         """Sincroniza un lead específico con un CRM"""
         
-        if not db:
-            db = next(get_db())
-        
         if isinstance(crm_provider, str):
             crm_provider = CRMProvider(crm_provider)
+        
+        # Log inicio de sync
+        sync_log = SyncLog(
+            integration_type=crm_provider.value,
+            operation=f"sync_lead_{direction.value}",
+            internal_id=lead.id,
+            status=SyncStatus.IN_PROGRESS,
+            details={"direction": direction.value, "crm_provider": crm_provider.value},
+            started_at=datetime.utcnow()
+        )
+        
+        db.add(sync_log)
+        db.commit()
+        db.refresh(sync_log)
         
         try:
             # Verificar si el CRM está disponible
             crm_service = self.crm_services.get(crm_provider)
             if not crm_service:
                 raise ValueError(f"CRM provider {crm_provider} no soportado")
-            
-            # Log inicio de sync
-            sync_log = SyncLog(
-                integration_type=crm_provider,
-                operation=f"sync_lead_{direction}",
-                internal_id=lead.id,
-                status=SyncStatus.IN_PROGRESS,
-                details={"direction": direction, "crm_provider": crm_provider}
-            )
-            
-            db.add(sync_log)
-            db.commit()
-            db.refresh(sync_log)
             
             # Ejecutar sincronización según dirección
             if direction == SyncDirection.PUSH:
@@ -138,6 +127,7 @@ class CRMSyncManager:
             sync_log.external_id = result.get("crm_id")
             sync_log.details.update(result)
             sync_log.completed_at = datetime.utcnow()
+            sync_log.duration_ms = int((datetime.utcnow() - sync_log.started_at).total_seconds() * 1000)
             
             db.commit()
             
@@ -148,14 +138,15 @@ class CRMSyncManager:
             sync_log.status = SyncStatus.FAILED
             sync_log.error_message = str(e)
             sync_log.completed_at = datetime.utcnow()
+            sync_log.duration_ms = int((datetime.utcnow() - sync_log.started_at).total_seconds() * 1000)
             db.commit()
             
-            print(f"❌ Error sincronizando lead {lead.id} con {crm_provider}: {e}")
+            logger.error(f"Error sincronizando lead {lead.id} con {crm_provider}: {e}")
             
             return {
                 "success": False,
                 "error": str(e),
-                "operation": "bidirectional"
+                "operation": "sync"
             }
     
     def _map_internal_to_crm(self, lead: Lead, crm_provider: CRMProvider) -> Dict[str, Any]:
@@ -189,15 +180,18 @@ class CRMSyncManager:
         # Agregar campos específicos por CRM
         if crm_provider == CRMProvider.HUBSPOT:
             crm_data["hs_lead_source"] = lead.source or "api"
-            crm_data["hs_score"] = lead.score
+            if lead.score is not None:
+                crm_data["hs_score"] = lead.score
             
         elif crm_provider == CRMProvider.PIPEDRIVE:
             crm_data["lead_source"] = lead.source or "api"
-            crm_data["lead_score"] = lead.score
+            if lead.score is not None:
+                crm_data["lead_score"] = lead.score
             
         elif crm_provider == CRMProvider.SALESFORCE:
             crm_data["LeadSource"] = lead.source or "API"
-            crm_data["Lead_Score__c"] = lead.score
+            if lead.score is not None:
+                crm_data["Lead_Score__c"] = lead.score
         
         return crm_data
     
@@ -229,7 +223,6 @@ class CRMSyncManager:
                         internal_data["name"] = full_name
                 
                 elif internal_field == "status":
-                    # Mapear status CRM a status internos
                     internal_data["status"] = self._map_status_from_crm(value, crm_provider)
                 
                 elif value is not None:
@@ -242,24 +235,24 @@ class CRMSyncManager:
         
         status_mappings = {
             CRMProvider.HUBSPOT: {
-                "new": "lead",
-                "qualified": "marketingqualifiedlead",
-                "opportunity": "salesqualifiedlead",
-                "customer": "customer",
+                "cold": "lead",
+                "warm": "marketingqualifiedlead", 
+                "hot": "salesqualifiedlead",
+                "converted": "customer",
                 "lost": "other"
             },
             CRMProvider.PIPEDRIVE: {
-                "new": "Open",
-                "qualified": "Qualified",
-                "opportunity": "Contacted",
-                "customer": "Won",
+                "cold": "Open",
+                "warm": "Qualified", 
+                "hot": "Contacted",
+                "converted": "Won",
                 "lost": "Lost"
             },
             CRMProvider.SALESFORCE: {
-                "new": "New",
-                "qualified": "Qualified",
-                "opportunity": "Working - Contacted",
-                "customer": "Closed - Converted",
+                "cold": "New",
+                "warm": "Qualified",
+                "hot": "Working - Contacted", 
+                "converted": "Closed - Converted",
                 "lost": "Closed - Not Converted"
             }
         }
@@ -270,33 +263,32 @@ class CRMSyncManager:
     def _map_status_from_crm(self, crm_status: str, crm_provider: CRMProvider) -> str:
         """Mapea status CRM a status interno"""
         
-        # Mapeo inverso del anterior
         status_mappings = {
             CRMProvider.HUBSPOT: {
-                "lead": "new",
-                "marketingqualifiedlead": "qualified",
-                "salesqualifiedlead": "opportunity",
-                "customer": "customer",
+                "lead": "cold",
+                "marketingqualifiedlead": "warm",
+                "salesqualifiedlead": "hot", 
+                "customer": "converted",
                 "other": "lost"
             },
             CRMProvider.PIPEDRIVE: {
-                "Open": "new",
-                "Qualified": "qualified",
-                "Contacted": "opportunity",
-                "Won": "customer",
+                "Open": "cold",
+                "Qualified": "warm",
+                "Contacted": "hot",
+                "Won": "converted", 
                 "Lost": "lost"
             },
             CRMProvider.SALESFORCE: {
-                "New": "new",
-                "Qualified": "qualified",
-                "Working - Contacted": "opportunity",
-                "Closed - Converted": "customer",
+                "New": "cold",
+                "Qualified": "warm",
+                "Working - Contacted": "hot",
+                "Closed - Converted": "converted",
                 "Closed - Not Converted": "lost"
             }
         }
         
         mapping = status_mappings.get(crm_provider, {})
-        return mapping.get(crm_status, "new")
+        return mapping.get(crm_status, "cold")
     
     async def _find_existing_crm_record(self, 
                                       lead: Lead,
@@ -341,17 +333,13 @@ class CRMSyncManager:
             )
             
             if strategy == "crm_wins":
-                # CRM gana, no actualizar
                 continue
             elif strategy == "internal_wins":
-                # Interno gana, usar valor nuevo
                 resolved_data[field] = new_value
             elif strategy == "most_complete_wins":
-                # El valor más completo gana
                 if len(str(new_value)) > len(str(existing_value)):
                     resolved_data[field] = new_value
             elif strategy == "last_modified_wins":
-                # Por defecto, usar valor nuevo (interno es más reciente)
                 resolved_data[field] = new_value
         
         return resolved_data
@@ -372,24 +360,19 @@ class CRMSyncManager:
                 resolved_data[field] = crm_value
                 continue
             
-            # Aplicar estrategia de resolución
             strategy = self.conflict_resolution["field_priority"].get(
                 field,
                 self.conflict_resolution["default_strategy"]
             )
             
             if strategy == "crm_wins":
-                # CRM gana
                 resolved_data[field] = crm_value
             elif strategy == "internal_wins":
-                # Interno gana, no actualizar
                 continue
             elif strategy == "most_complete_wins":
-                # El más completo gana
                 if len(str(crm_value)) > len(str(internal_value)):
                     resolved_data[field] = crm_value
             elif strategy == "last_modified_wins":
-                # CRM es más reciente en pull
                 resolved_data[field] = crm_value
         
         return resolved_data
@@ -401,13 +384,15 @@ class CRMSyncManager:
                                        db: Session):
         """Actualiza la referencia CRM en el lead interno"""
         
-        # Actualizar metadata del lead
-        if not lead.metadata:
-            lead.metadata = {}
+        # Actualizar campo específico del CRM
+        if crm_provider == CRMProvider.HUBSPOT:
+            lead.hubspot_id = crm_id
+        elif crm_provider == CRMProvider.PIPEDRIVE:
+            lead.pipedrive_id = crm_id
+        elif crm_provider == CRMProvider.SALESFORCE:
+            lead.salesforce_id = crm_id
         
-        lead.metadata[f"{crm_provider}_id"] = crm_id
-        lead.metadata[f"{crm_provider}_last_sync"] = datetime.utcnow().isoformat()
-        
+        lead.updated_at = datetime.utcnow()
         db.commit()
     
     async def bulk_sync_leads(self, 
@@ -417,9 +402,6 @@ class CRMSyncManager:
                             batch_size: int = 50,
                             db: Session = None) -> Dict[str, Any]:
         """Sincroniza múltiples leads en lotes"""
-        
-        if not db:
-            db = next(get_db())
         
         if isinstance(crm_provider, str):
             crm_provider = CRMProvider(crm_provider)
@@ -467,7 +449,7 @@ class CRMSyncManager:
             # Pausa entre lotes para no saturar APIs
             await asyncio.sleep(2)
             
-            print(f"🔄 Procesado lote {i//batch_size + 1}: {len(leads)} leads")
+            logger.info(f"Procesado lote {i//batch_size + 1}: {len(leads)} leads")
         
         return results
     
@@ -476,9 +458,6 @@ class CRMSyncManager:
                                   since_date: Optional[datetime] = None,
                                   db: Session = None) -> Dict[str, Any]:
         """Sincroniza todos los leads (o desde una fecha) a un CRM"""
-        
-        if not db:
-            db = next(get_db())
         
         # Query base
         query = db.query(Lead)
@@ -492,9 +471,8 @@ class CRMSyncManager:
         all_leads = query.all()
         lead_ids = [lead.id for lead in all_leads]
         
-        print(f"🚀 Iniciando sync masivo de {len(lead_ids)} leads a {crm_provider}")
+        logger.info(f"Iniciando sync masivo de {len(lead_ids)} leads a {crm_provider}")
         
-        # Usar bulk sync
         return await self.bulk_sync_leads(
             lead_ids, crm_provider, SyncDirection.PUSH, db=db
         )
@@ -515,7 +493,6 @@ class CRMSyncManager:
                     "timestamp": datetime.utcnow().isoformat()
                 }
         
-        # Estado general
         all_healthy = all(
             result.get("status") == "healthy" 
             for result in health_results.values()
@@ -533,16 +510,13 @@ class CRMSyncManager:
                              db: Session = None) -> Dict[str, Any]:
         """Obtiene métricas de sincronización"""
         
-        if not db:
-            db = next(get_db())
-        
         since_date = datetime.utcnow() - timedelta(days=days)
         
         # Query base
-        query = db.query(SyncLog).filter(SyncLog.created_at > since_date)
+        query = db.query(SyncLog).filter(SyncLog.started_at > since_date)
         
         if crm_provider:
-            query = query.filter(SyncLog.integration_type == crm_provider)
+            query = query.filter(SyncLog.integration_type == crm_provider.value)
         
         sync_logs = query.all()
         
@@ -575,7 +549,7 @@ class CRMSyncManager:
         error_counts = {}
         
         for log in error_logs:
-            error = log.error_message[:100]  # Truncar para agrupación
+            error = log.error_message[:100]
             error_counts[error] = error_counts.get(error, 0) + 1
         
         top_errors = sorted(error_counts.items(), key=lambda x: x[1], reverse=True)[:5]
@@ -599,15 +573,12 @@ class CRMSyncManager:
                                db: Session = None) -> Dict[str, Any]:
         """Reintenta sincronizaciones fallidas"""
         
-        if not db:
-            db = next(get_db())
-        
         since_date = datetime.utcnow() - timedelta(hours=hours_back)
         
         # Buscar syncs fallidos
         failed_syncs = db.query(SyncLog)\
             .filter(SyncLog.status == SyncStatus.FAILED)\
-            .filter(SyncLog.created_at > since_date)\
+            .filter(SyncLog.started_at > since_date)\
             .filter(SyncLog.retry_count < max_retries)\
             .all()
         
@@ -627,7 +598,7 @@ class CRMSyncManager:
                 
                 # Extraer parámetros del sync original
                 crm_provider = CRMProvider(sync_log.integration_type)
-                direction = SyncDirection(sync_log.details.get("direction", "push"))
+                direction = SyncDirection(sync_log.sync_direction or SyncDirection.PUSH)
                 
                 # Reintentar sync
                 retry_result = await self.sync_lead_to_crm(lead, crm_provider, direction, db)
@@ -637,10 +608,10 @@ class CRMSyncManager:
                 
                 if retry_result["success"]:
                     results["successful_retries"] += 1
-                    print(f"✅ Retry exitoso para lead {lead.id}")
+                    logger.info(f"Retry exitoso para lead {lead.id}")
                 else:
                     results["failed_retries"] += 1
-                    print(f"❌ Retry fallido para lead {lead.id}: {retry_result.get('error')}")
+                    logger.error(f"Retry fallido para lead {lead.id}: {retry_result.get('error')}")
                 
                 db.commit()
                 
@@ -648,7 +619,7 @@ class CRMSyncManager:
                 results["failed_retries"] += 1
                 sync_log.retry_count += 1
                 db.commit()
-                print(f"❌ Error en retry: {e}")
+                logger.error(f"Error en retry: {e}")
             
             # Pausa entre reintentos
             await asyncio.sleep(1)
@@ -661,13 +632,10 @@ class CRMSyncManager:
                                       db: Session = None) -> Dict[str, Any]:
         """Configura una integración CRM"""
         
-        if not db:
-            db = next(get_db())
-        
         try:
             # Crear o actualizar configuración
             integration = db.query(Integration)\
-                .filter(Integration.provider == crm_provider)\
+                .filter(Integration.provider == crm_provider.value)\
                 .first()
             
             if integration:
@@ -678,7 +646,8 @@ class CRMSyncManager:
             else:
                 # Crear nueva
                 integration = Integration(
-                    provider=crm_provider,
+                    provider=crm_provider.value,
+                    name=f"CRM {crm_provider.value.title()}",
                     config=config,
                     is_active=config.get("is_active", True),
                     created_at=datetime.utcnow()
@@ -694,6 +663,7 @@ class CRMSyncManager:
                 
                 if health_check.get("status") == "healthy":
                     integration.last_health_check = datetime.utcnow()
+                    integration.health_status = "healthy"
                     db.commit()
                     
                     return {
@@ -777,7 +747,7 @@ class CRMSyncManager:
                     # Crear registro en CRMSync
                     crm_sync = CRMSync(
                         lead_id=lead.id,
-                        crm_provider=crm_provider,
+                        crm_provider=crm_provider.value,
                         crm_id=crm_id,
                         last_synced_at=datetime.utcnow(),
                         sync_direction=SyncDirection.PUSH,
@@ -889,4 +859,16 @@ class CRMSyncManager:
             return {
                 "success": False,
                 "error": str(e),
-                }
+                "operation": "bidirectional"
+            }
+
+# Instancia global del manager
+crm_sync_manager = CRMSyncManager()
+
+# Función helper para uso rápido
+async def sync_lead_to_crm(lead: Lead, 
+                          crm_provider: Union[str, CRMProvider],
+                          direction: SyncDirection = SyncDirection.PUSH,
+                          db: Session = None) -> Dict[str, Any]:
+    """Función helper para sincronización rápida"""
+    return await crm_sync_manager.sync_lead_to_crm(lead, crm_provider, direction, db)

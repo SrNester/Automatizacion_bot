@@ -11,8 +11,7 @@ from ..services.integrations.meta_ads_service import MetaAdsService
 from ..services.integrations.crm_sync_manager import CRMSyncManager, CRMProvider, SyncDirection
 from ..services.integrations.pipedrive_service import PipedriveService
 from ..services.integrations.hubspot_service import HubSpotService
-from ..models.integration import Integration, ExternalLead, SyncLog, CRMSync, WebhookEvent
-from ..models.lead import Lead
+from ..models.integration import Integration, ExternalLead, SyncLog, CRMSync, WebhookEvent, Lead
 
 router = APIRouter()
 

@@ -34,6 +34,59 @@ class SyncDirection(str, Enum):
     PULL = "pull"  # External → Internal
     BIDIRECTIONAL = "bidirectional"
 
+class LeadStatus(str, Enum):
+    COLD = "cold"
+    WARM = "warm"
+    HOT = "hot"
+    CONVERTED = "converted"
+    LOST = "lost"
+
+class Lead(Base):
+    __tablename__ = "leads"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
+    phone = Column(String)
+    company = Column(String)
+    job_title = Column(String)
+    
+    # Lead Scoring
+    score = Column(Float, default=0.0)
+    status = Column(String, default=LeadStatus.COLD)
+    
+    # Tracking
+    source = Column(String)  # meta_ads, google_ads, linkedin, website
+    utm_campaign = Column(String)
+    first_interaction = Column(DateTime, default=datetime.utcnow)
+    last_interaction = Column(DateTime, default=datetime.utcnow)
+    
+    # Preferences
+    interests = Column(Text)  # JSON string
+    budget_range = Column(String)
+    timeline = Column(String)
+    
+    # Flags
+    is_qualified = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
+    
+    # Integrations IDs
+    hubspot_id = Column(String, index=True)
+    pipedrive_id = Column(String, index=True)
+    salesforce_id = Column(String, index=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    interactions = relationship("Interaction", back_populates="lead")
+    external_leads = relationship("ExternalLead", back_populates="lead")
+    crm_syncs = relationship("CRMSync", back_populates="lead")
+    workflow_executions = relationship("WorkflowExecution", back_populates="lead")
+    email_sends = relationship("EmailSend", back_populates="lead")
+    segment_memberships = relationship("LeadSegmentMembership", back_populates="lead")
+    campaign_leads = relationship("CampaignLead", back_populates="lead")  # ✅ NUEVA RELACIÓN
+
 class Integration(Base):
     __tablename__ = "integrations"
     
@@ -313,9 +366,6 @@ class ExternalCampaign(Base):
     
     # Relationships
     integration = relationship("Integration")
-    external_leads = relationship("ExternalLead", 
-                                foreign_keys="ExternalLead.external_campaign_id",
-                                primaryjoin="ExternalCampaign.external_campaign_id == ExternalLead.external_campaign_id")
 
 class IntegrationHealth(Base):
     __tablename__ = "integration_health"
