@@ -9,7 +9,7 @@ import json
 from ..core.database import get_db
 from ..services.analytics.analytics_engine import AnalyticsEngine
 from ..services.report_generator import ReportGenerator
-from ..services.notifications.notification_service import NotificationService
+from ..services.reporting_service import reporting_service
 from ..models.integration import Lead 
 
 router = APIRouter()
@@ -17,7 +17,7 @@ router = APIRouter()
 # Servicios
 analytics_engine = AnalyticsEngine()
 report_generator = ReportGenerator()
-notification_service = NotificationService()
+notification_service = reporting_service()
 
 # =============================================================================
 # PYDANTIC MODELS
