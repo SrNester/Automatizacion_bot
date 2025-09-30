@@ -7,7 +7,7 @@ import asyncio
 from dataclasses import dataclass
 
 from ..models.workflow import Workflow, WorkflowExecution, WorkflowStep
-from ..models.lead import Lead
+from ..models.integration import Lead
 from ..services.email_automation import EmailAutomationService
 from ..services.lead_scoring import LeadScoringService
 from ..core.database import get_db

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import json
 import redis.asyncio as redis
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, or_
+from sqlalchemy import select, func, and_, or_, olumn, Integer, String, DateTime
 from sqlalchemy.orm import selectinload
 import numpy as np
 from collections import defaultdict

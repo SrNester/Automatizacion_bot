@@ -1,236 +1,297 @@
-import os
-from typing import Optional
-from pydantic import BaseSettings
+from pydantic import BaseSettings, validator
+from typing import List, Optional, Dict, Any
+from datetime import timedelta
+import secrets
+import logging
+from functools import lru_cache
 
 class Settings(BaseSettings):
-    # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/automatizacion_bot")
+    """Configuración de la aplicación usando Pydantic BaseSettings"""
     
-    # OpenAI
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-    
-    # WhatsApp Business API
-    WHATSAPP_ACCESS_TOKEN: str = os.getenv("WHATSAPP_ACCESS_TOKEN", "")
-    WHATSAPP_PHONE_NUMBER_ID: str = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "")
-    WHATSAPP_WEBHOOK_SECRET: str = os.getenv("WHATSAPP_WEBHOOK_SECRET", "")
-    WHATSAPP_VERIFY_TOKEN: str = os.getenv("WHATSAPP_VERIFY_TOKEN", "your_verify_token_here")
-    
-    # Telegram Bot API
-    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
-    TELEGRAM_WEBHOOK_SECRET: str = os.getenv("TELEGRAM_WEBHOOK_SECRET", "")
-    
-    # HubSpot
-    HUBSPOT_ACCESS_TOKEN: str = os.getenv("HUBSPOT_ACCESS_TOKEN", "")
-    HUBSPOT_CLIENT_SECRET: str = os.getenv("HUBSPOT_CLIENT_SECRET", "")
-    HUBSPOT_CLIENT_ID: str = os.getenv("HUBSPOT_CLIENT_ID", "")
-    
-    # Meta Ads API (Fase 4)
-    META_ACCESS_TOKEN: str = os.getenv("META_ACCESS_TOKEN", "")
-    META_APP_SECRET: str = os.getenv("META_APP_SECRET", "")
-    META_AD_ACCOUNT_ID: str = os.getenv("META_AD_ACCOUNT_ID", "")
-    
-    # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-here-change-in-production")
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
-    
-    # Redis (para cache y sesiones)
-    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    
-    # Email (SendGrid Fase 3)
-    SENDGRID_API_KEY: str = os.getenv("SENDGRID_API_KEY", "")
-    FROM_EMAIL: str = os.getenv("FROM_EMAIL", "noreply@tudominio.com")
-    
-    # Slack/Teams (para notificaciones)
-    SLACK_WEBHOOK_URL: str = os.getenv("SLACK_WEBHOOK_URL", "")
-    TEAMS_WEBHOOK_URL: str = os.getenv("TEAMS_WEBHOOK_URL", "")
-    
-    # App Settings
-    APP_NAME: str = "Automatización Bot"
+    # =========================================================================
+    # CONFIGURACIÓN BÁSICA DE LA APLICACIÓN
+    # =========================================================================
+    APP_NAME: str = "Sales Automation Platform"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
+    APP_DESCRIPTION: str = "Plataforma de automatización de ventas con IA"
+    DEBUG: bool = False
+    ENVIRONMENT: str = "production"  # development, staging, production
     
-    # API Settings
-    API_V1_PREFIX: str = "/api/v1"
-    ALLOWED_HOSTS: list = ["*"]  # Cambiar en producción
+    # =========================================================================
+    # SEGURIDAD Y AUTENTICACIÓN
+    # =========================================================================
+    SECRET_KEY: str = secrets.token_urlsafe(32)
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 días
     
-    # Chatbot Settings
-    MAX_CONVERSATION_DURATION_HOURS: int = 24
-    MAX_MESSAGES_PER_CONVERSATION: int = 50
-    AUTO_ESCALATION_THRESHOLD: int = 10
-    RESPONSE_TIMEOUT_SECONDS: int = 30
+    # CORS
+    ALLOWED_HOSTS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     
-    # Lead Scoring Settings
-    INITIAL_LEAD_SCORE: int = 25
-    CHATBOT_INTERACTION_BOOST: int = 5
-    BUYING_SIGNAL_BOOST: int = 15
-    DEMO_REQUEST_BOOST: int = 25
+    # =========================================================================
+    # BASE DE DATOS
+    # =========================================================================
+    DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost/sales_automation"
+    DATABASE_POOL_SIZE: int = 20
+    DATABASE_MAX_OVERFLOW: int = 30
+    DATABASE_POOL_RECYCLE: int = 3600
+    DATABASE_ECHO: bool = False
     
-    # Rate Limiting
-    RATE_LIMIT_PER_MINUTE: int = 60
-    WEBHOOK_RATE_LIMIT: int = 1000
+    # =========================================================================
+    # REDIS Y CACHE
+    # =========================================================================
+    REDIS_URL: str = "redis://localhost:6379/0"
+    CACHE_TTL: int = 300  # 5 minutos por defecto
+    CACHE_ENABLED: bool = True
+    
+    # =========================================================================
+    # CELERY Y TAREAS EN BACKGROUND
+    # =========================================================================
+    CELERY_BROKER_URL: str = "redis://localhost:6379/1"
+    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
+    CELERY_TASK_SERIALIZER: str = "json"
+    CELERY_ACCEPT_CONTENT: List[str] = ["json"]
+    
+    # =========================================================================
+    # INTEGRACIONES EXTERNAS - HUBSPOT
+    # =========================================================================
+    HUBSPOT_ACCESS_TOKEN: Optional[str] = None
+    HUBSPOT_REFRESH_TOKEN: Optional[str] = None
+    HUBSPOT_CLIENT_ID: Optional[str] = None
+    HUBSPOT_CLIENT_SECRET: Optional[str] = None
+    HUBSPOT_REDIRECT_URI: Optional[str] = None
+    HUBSPOT_API_BASE_URL: str = "https://api.hubapi.com"
+    
+    # =========================================================================
+    # EMAIL Y NOTIFICACIONES
+    # =========================================================================
+    SMTP_SERVER: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    EMAIL_FROM: str = "noreply@company.com"
+    EMAIL_FROM_NAME: str = "Sales Automation"
+    
+    # SendGrid
+    SENDGRID_API_KEY: Optional[str] = None
+    SENDGRID_FROM_EMAIL: str = "noreply@company.com"
+    
+    # Slack
+    SLACK_BOT_TOKEN: Optional[str] = None
+    SLACK_WEBHOOK_URL: Optional[str] = None
+    SLACK_SIGNING_SECRET: Optional[str] = None
+    
+    # SMS (Twilio)
+    TWILIO_ACCOUNT_SID: Optional[str] = None
+    TWILIO_AUTH_TOKEN: Optional[str] = None
+    TWILIO_PHONE_NUMBER: Optional[str] = None
+    SMS_ENABLED: bool = False
+    
+    # =========================================================================
+    # IA Y MACHINE LEARNING
+    # =========================================================================
+    OPENAI_API_KEY: Optional[str] = None
+    HUGGINGFACE_API_KEY: Optional[str] = None
+    AI_MODEL_NAME: str = "gpt-3.5-turbo"
+    AI_MAX_TOKENS: int = 1000
+    AI_TEMPERATURE: float = 0.7
+    
+    # =========================================================================
+    # MONITOREO Y LOGGING
+    # =========================================================================
+    LOG_LEVEL: str = "INFO"
+    SENTRY_DSN: Optional[str] = None
+    PROMETHEUS_PORT: int = 8001
+    
+    # =========================================================================
+    # ALMACENAMIENTO Y ARCHIVOS
+    # =========================================================================
+    AWS_ACCESS_KEY_ID: Optional[str] = None
+    AWS_SECRET_ACCESS_KEY: Optional[str] = None
+    AWS_REGION: str = "us-east-1"
+    S3_BUCKET_NAME: Optional[str] = None
+    UPLOAD_MAX_SIZE: int = 50 * 1024 * 1024  # 50MB
+    
+    # =========================================================================
+    # CONFIGURACIÓN DE LA EMPRESA
+    # =========================================================================
+    COMPANY_NAME: str = "Mi Empresa"
+    COMPANY_LOGO_URL: Optional[str] = None
+    COMPANY_CONTACT_INFO: str = "contacto@miempresa.com"
+    APP_URL: str = "http://localhost:8000"
+    
+    # =========================================================================
+    # CONFIGURACIONES ESPECÍFICAS DEL SISTEMA
+    # =========================================================================
+    
+    # Lead Scoring
+    LEAD_SCORING_ENABLED: bool = True
+    LEAD_SCORING_THRESHOLD_HOT: int = 80
+    LEAD_SCORING_THRESHOLD_WARM: int = 50
+    LEAD_SCORING_UPDATE_INTERVAL: int = 60  # minutos
+    
+    # Workflows
+    WORKFLOW_MAX_STEPS: int = 20
+    WORKFLOW_MAX_EXECUTIONS_PER_LEAD: int = 3
+    WORKFLOW_CLEANUP_DAYS: int = 30
+    
+    # Email Automation
+    EMAIL_MAX_BATCH_SIZE: int = 1000
+    EMAIL_RATE_LIMIT_PER_HOUR: int = 1000
+    EMAIL_TRACKING_ENABLED: bool = True
+    
+    # Reportes
+    REPORT_CACHE_ENABLED: bool = True
+    REPORT_CACHE_TTL: int = 3600  # 1 hora
+    REPORT_MAX_RECIPIENTS: int = 50
+    REPORT_MAX_SIZE_MB: int = 50
+    
+    # Alertas
+    ALERT_EMAIL_RECIPIENTS: List[str] = ["alerts@company.com"]
+    SYSTEM_HEALTH_CHECK_INTERVAL: int = 5  # minutos
+    
+    # =========================================================================
+    # VALIDACIONES Y CONFIGURACIONES DERIVADAS
+    # =========================================================================
+    
+    @validator("ALLOWED_HOSTS", pre=True)
+    def parse_allowed_hosts(cls, v):
+        if isinstance(v, str):
+            return [host.strip() for host in v.split(",")]
+        return v
+    
+    @validator("CORS_ORIGINS", pre=True)
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",")]
+        return v
+    
+    @validator("ALERT_EMAIL_RECIPIENTS", pre=True)
+    def parse_alert_recipients(cls, v):
+        if isinstance(v, str):
+            return [email.strip() for email in v.split(",")]
+        return v
+    
+    @property
+    def is_development(self) -> bool:
+        return self.ENVIRONMENT == "development"
+    
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT == "production"
+    
+    @property
+    def is_staging(self) -> bool:
+        return self.ENVIRONMENT == "staging"
+    
+    @property
+    def database_config(self) -> Dict[str, Any]:
+        return {
+            "url": self.DATABASE_URL,
+            "pool_size": self.DATABASE_POOL_SIZE,
+            "max_overflow": self.DATABASE_MAX_OVERFLOW,
+            "pool_recycle": self.DATABASE_POOL_RECYCLE,
+            "echo": self.DATABASE_ECHO
+        }
+    
+    @property
+    def celery_config(self) -> Dict[str, Any]:
+        return {
+            "broker_url": self.CELERY_BROKER_URL,
+            "result_backend": self.CELERY_RESULT_BACKEND,
+            "task_serializer": self.CELERY_TASK_SERIALIZER,
+            "accept_content": self.CELERY_ACCEPT_CONTENT,
+            "timezone": "UTC"
+        }
+    
+    @property
+    def security_config(self) -> Dict[str, Any]:
+        return {
+            "secret_key": self.SECRET_KEY,
+            "algorithm": self.ALGORITHM,
+            "access_token_expire": timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES)
+        }
+    
+    @property
+    def email_config(self) -> Dict[str, Any]:
+        return {
+            "smtp_server": self.SMTP_SERVER,
+            "smtp_port": self.SMTP_PORT,
+            "smtp_username": self.SMTP_USERNAME,
+            "smtp_password": self.SMTP_PASSWORD,
+            "from_email": self.EMAIL_FROM,
+            "from_name": self.EMAIL_FROM_NAME,
+            "sendgrid_api_key": self.SENDGRID_API_KEY
+        }
+    
+    @property
+    def hubspot_config(self) -> Dict[str, Any]:
+        return {
+            "access_token": self.HUBSPOT_ACCESS_TOKEN,
+            "refresh_token": self.HUBSPOT_REFRESH_TOKEN,
+            "client_id": self.HUBSPOT_CLIENT_ID,
+            "client_secret": self.HUBSPOT_CLIENT_SECRET,
+            "redirect_uri": self.HUBSPOT_REDIRECT_URI,
+            "api_base_url": self.HUBSPOT_API_BASE_URL
+        }
+    
+    @property
+    def ai_config(self) -> Dict[str, Any]:
+        return {
+            "openai_api_key": self.OPENAI_API_KEY,
+            "huggingface_api_key": self.HUGGINGFACE_API_KEY,
+            "model_name": self.AI_MODEL_NAME,
+            "max_tokens": self.AI_MAX_TOKENS,
+            "temperature": self.AI_TEMPERATURE
+        }
+    
+    @property
+    def logging_config(self) -> Dict[str, Any]:
+        return {
+            "level": self.LOG_LEVEL,
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        }
     
     class Config:
         env_file = ".env"
         case_sensitive = True
+        validate_assignment = True
+
+@lru_cache()
+def get_settings() -> Settings:
+    """
+    Retorna la configuración caché de la aplicación
+    Uso: settings = get_settings()
+    """
+    return Settings()
 
 # Instancia global de configuración
-settings = Settings()
+settings = get_settings()
 
-# Validaciones de configuración
-def validate_config():
-    """Valida que la configuración esté completa para cada fase"""
+def setup_logging():
+    """Configura el logging basado en la configuración"""
     
-    missing_vars = []
-    warnings = []
+    logging_config = settings.logging_config
+    logging.basicConfig(
+        level=getattr(logging, logging_config["level"]),
+        format=logging_config["format"]
+    )
     
-    # Validaciones básicas (Fase 1)
-    if not settings.DATABASE_URL or settings.DATABASE_URL == "postgresql://user:pass@localhost/automatizacion_bot":
-        warnings.append("DATABASE_URL usando valor por defecto")
-    
-    if not settings.SECRET_KEY or settings.SECRET_KEY == "your-secret-key-here-change-in-production":
-        missing_vars.append("SECRET_KEY debe ser configurado")
-    
-    # Validaciones Fase 2 (Chatbot)
-    if not settings.OPENAI_API_KEY:
-        missing_vars.append("OPENAI_API_KEY requerido para AI Assistant")
-    
-    # WhatsApp (opcional Fase 2)
-    whatsapp_vars = [
-        "WHATSAPP_ACCESS_TOKEN",
-        "WHATSAPP_PHONE_NUMBER_ID", 
-        "WHATSAPP_WEBHOOK_SECRET"
+    # Configurar loggers específicos
+    loggers = [
+        "uvicorn",
+        "fastapi",
+        "sqlalchemy",
+        "celery",
+        "services",
+        "app"
     ]
     
-    whatsapp_missing = [var for var in whatsapp_vars if not getattr(settings, var)]
-    if whatsapp_missing:
-        warnings.append(f"WhatsApp no configurado completamente: {whatsapp_missing}")
+    for logger_name in loggers:
+        logger = logging.getLogger(logger_name)
+        logger.setLevel(getattr(logging, logging_config["level"]))
     
-    # HubSpot (parcialmente implementado)
-    hubspot_vars = ["HUBSPOT_ACCESS_TOKEN", "HUBSPOT_CLIENT_SECRET"]
-    hubspot_missing = [var for var in hubspot_vars if not getattr(settings, var)]
-    if hubspot_missing:
-        warnings.append(f"HubSpot no configurado completamente: {hubspot_missing}")
-    
-    # Resultado de validación
-    validation_result = {
-        "is_valid": len(missing_vars) == 0,
-        "missing_required": missing_vars,
-        "warnings": warnings,
-        "phase_readiness": {
-            "phase_1": len(missing_vars) == 0,  # Core system
-            "phase_2": len(missing_vars) == 0 and settings.OPENAI_API_KEY,  # Chatbot
-            "phase_3": settings.SENDGRID_API_KEY != "",  # Email automation
-            "phase_4": settings.META_ACCESS_TOKEN != "",  # Integrations
-            "phase_5": True  # Dashboard (solo frontend)
-        }
-    }
-    
-    return validation_result
+    return logging_config
 
-def get_phase_config(phase: int) -> dict:
-    """Retorna configuración específica para cada fase"""
-    
-    phase_configs = {
-        1: {
-            "name": "Core System",
-            "required_vars": ["DATABASE_URL", "SECRET_KEY"],
-            "optional_vars": ["DEBUG", "REDIS_URL"],
-            "description": "Base de datos, modelos, APIs básicas"
-        },
-        2: {
-            "name": "Chatbot e IA Assistant", 
-            "required_vars": ["OPENAI_API_KEY"],
-            "optional_vars": ["WHATSAPP_ACCESS_TOKEN", "TELEGRAM_BOT_TOKEN"],
-            "description": "AI Assistant, webhooks, procesamiento de mensajes"
-        },
-        3: {
-            "name": "Nurturing Automation",
-            "required_vars": ["SENDGRID_API_KEY", "FROM_EMAIL"],
-            "optional_vars": ["SLACK_WEBHOOK_URL"],
-            "description": "Email automation, workflows, notificaciones"
-        },
-        4: {
-            "name": "Integraciones",
-            "required_vars": ["META_ACCESS_TOKEN", "HUBSPOT_ACCESS_TOKEN"],
-            "optional_vars": ["META_AD_ACCOUNT_ID"],
-            "description": "Meta Ads, CRM sync, WhatsApp Business completo"
-        },
-        5: {
-            "name": "Dashboard y Analytics",
-            "required_vars": [],
-            "optional_vars": ["REDIS_URL"],
-            "description": "Frontend, métricas, reportes"
-        }
-    }
-    
-    return phase_configs.get(phase, {})
-
-def print_config_status():
-    """Imprime el estado actual de la configuración"""
-    
-    validation = validate_config()
-    
-    print("\n🔧 ESTADO DE CONFIGURACIÓN")
-    print("="*50)
-    
-    if validation["is_valid"]:
-        print("✅ Configuración básica completa")
-    else:
-        print("❌ Configuración incompleta")
-        for missing in validation["missing_required"]:
-            print(f"   • Falta: {missing}")
-    
-    if validation["warnings"]:
-        print("\n⚠️  Advertencias:")
-        for warning in validation["warnings"]:
-            print(f"   • {warning}")
-    
-    print("\n📋 PREPARACIÓN POR FASES:")
-    for phase, ready in validation["phase_readiness"].items():
-        status = "✅" if ready else "❌"
-        phase_num = phase.split("_")[1]
-        config = get_phase_config(int(phase_num))
-        print(f"   {status} {config.get('name', f'Fase {phase_num}')}")
-    
-    print("\n🚀 PRÓXIMOS PASOS:")
-    if not validation["is_valid"]:
-        print("   1. Configurar variables faltantes en .env")
-        print("   2. Ejecutar tests de configuración")
-    else:
-        ready_phases = [p for p, ready in validation["phase_readiness"].items() if ready]
-        if len(ready_phases) >= 2:
-            print("   1. Ejecutar tests de Fase 2")
-            print("   2. Configurar webhooks en desarrollo")
-        else:
-            print("   1. Configurar OpenAI API Key")
-            print("   2. Configurar al menos una plataforma (WhatsApp/Telegram)")
-
-# Configuración para diferentes entornos
-def get_environment_config(env: str = "development") -> dict:
-    """Retorna configuración específica por entorno"""
-    
-    configs = {
-        "development": {
-            "DEBUG": True,
-            "LOG_LEVEL": "DEBUG",
-            "WEBHOOK_VALIDATION": False,  # Desactivar para testing
-        },
-        "staging": {
-            "DEBUG": False,
-            "LOG_LEVEL": "INFO", 
-            "WEBHOOK_VALIDATION": True,
-        },
-        "production": {
-            "DEBUG": False,
-            "LOG_LEVEL": "WARNING",
-            "WEBHOOK_VALIDATION": True,
-            "RATE_LIMIT_STRICT": True,
-        }
-    }
-    
-    return configs.get(env, configs["development"])
-
-if __name__ == "__main__":
-    # Ejecutar validación si se corre directamente
-    print_config_status()
+# Configurar logging al importar el módulo
+setup_logging()

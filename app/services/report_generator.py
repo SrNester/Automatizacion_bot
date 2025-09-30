@@ -1,133 +1,315 @@
 import asyncio
 import pandas as pd
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 import io
 import base64
+import json
+import logging
+from pathlib import Path
+from enum import Enum
+
+# ReportLab para PDF
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, A4
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.linecharts import HorizontalLineChart
 from reportlab.graphics.charts.barcharts import VerticalBarChart
+
+# Excel
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.chart import LineChart, BarChart, Reference, PieChart
+from openpyxl.drawing.image import Image as ExcelImage
+
+# Visualizaciones
 import matplotlib.pyplot as plt
 import seaborn as sns
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment
-from openpyxl.chart import LineChart, BarChart, Reference
+import plotly.graph_objects as go
+import plotly.io as pio
+
+# Cache y rate limiting
+from fastapi_cache.decorator import cache
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from ..core.config import settings
 from ..services.analytics.analytics_engine import AnalyticsEngine
+from ..services.email_automation import EmailAutomationService
+
+# Logger
+logger = logging.getLogger("report_generator")
+
+class ReportFormat(str, Enum):
+    PDF = "pdf"
+    EXCEL = "excel"
+    JSON = "json"
+    HTML = "html"
+    CSV = "csv"
+
+class ReportType(str, Enum):
+    EXECUTIVE = "executive"
+    DETAILED_ANALYTICS = "detailed_analytics"
+    CHANNEL_PERFORMANCE = "channel_performance"
+    LEAD_QUALITY = "lead_quality"
+    CUSTOM = "custom"
 
 class ReportGenerator:
-    """Generador de reportes en múltiples formatos (PDF, Excel, HTML)"""
+    """Generador de reportes en múltiples formatos (PDF, Excel, HTML, JSON)"""
     
     def __init__(self):
         self.analytics_engine = AnalyticsEngine()
+        self.email_service = EmailAutomationService()
         
         # Configuración de estilos
         self.styles = getSampleStyleSheet()
-        self.company_colors = {
-            'primary': '#3B82F6',
-            'secondary': '#10B981', 
-            'accent': '#F59E0B',
-            'dark': '#1F2937',
-            'light': '#F9FAFB'
+        self._setup_custom_styles()
+        
+        # Configuración de la compañía
+        self.company_config = {
+            'name': settings.COMPANY_NAME,
+            'logo_path': settings.COMPANY_LOGO_PATH,
+            'colors': {
+                'primary': '#3B82F6',
+                'secondary': '#10B981', 
+                'accent': '#F59E0B',
+                'warning': '#EF4444',
+                'dark': '#1F2937',
+                'light': '#F9FAFB'
+            },
+            'contact_info': settings.COMPANY_CONTACT_INFO
         }
         
         # Templates de reportes
         self.report_templates = {
-            'executive': self._executive_template,
-            'detailed_analytics': self._detailed_analytics_template,
-            'channel_performance': self._channel_performance_template,
-            'lead_quality': self._lead_quality_template
+            ReportType.EXECUTIVE: self._executive_template,
+            ReportType.DETAILED_ANALYTICS: self._detailed_analytics_template,
+            ReportType.CHANNEL_PERFORMANCE: self._channel_performance_template,
+            ReportType.LEAD_QUALITY: self._lead_quality_template
+        }
+        
+        # Rate limiting
+        self.limiter = Limiter(key_func=get_remote_address)
+        
+        # Cache de reportes
+        self.cache_enabled = settings.REPORT_CACHE_ENABLED
+        
+    def _setup_custom_styles(self):
+        """Configura estilos personalizados para PDF"""
+        self.custom_styles = {
+            'title': ParagraphStyle(
+                'CustomTitle',
+                parent=self.styles['Heading1'],
+                fontSize=24,
+                textColor=colors.HexColor(self.company_config['colors']['primary']),
+                spaceAfter=30,
+                alignment=1  # Centered
+            ),
+            'subtitle': ParagraphStyle(
+                'CustomSubtitle',
+                parent=self.styles['Heading2'],
+                fontSize=16,
+                textColor=colors.HexColor(self.company_config['colors']['dark']),
+                spaceAfter=20
+            ),
+            'kpi_value': ParagraphStyle(
+                'KPIValue',
+                parent=self.styles['Normal'],
+                fontSize=18,
+                textColor=colors.HexColor(self.company_config['colors']['primary']),
+                alignment=1
+            ),
+            'kpi_label': ParagraphStyle(
+                'KPILabel',
+                parent=self.styles['Normal'],
+                fontSize=10,
+                textColor=colors.HexColor(self.company_config['colors']['dark']),
+                alignment=1
+            )
         }
     
-    async def generate_custom_report(self, 
-                                   report_type: str,
-                                   period: str,
-                                   custom_filters: Optional[Dict] = None,
-                                   db: Session = None) -> Dict[str, Any]:
-        """Genera un reporte personalizado en formato JSON"""
+    @cache(expire=3600)  # Cache por 1 hora
+    async def generate_report(self,
+                            report_type: ReportType,
+                            format_type: ReportFormat,
+                            period: str = "monthly",
+                            custom_filters: Optional[Dict] = None,
+                            db: Session = None) -> Dict[str, Any]:
+        """Genera reporte en el formato especificado"""
         
-        # Determinar días según período
+        try:
+            start_time = datetime.utcnow()
+            logger.info(f"Generando reporte {report_type} en formato {format_type}")
+            
+            # Validar parámetros
+            self._validate_report_parameters(report_type, format_type, period)
+            
+            # Obtener datos del reporte
+            report_data = await self._get_report_data(report_type, period, custom_filters, db)
+            
+            # Generar en formato específico
+            if format_type == ReportFormat.PDF:
+                content, filename, content_type = await self._generate_pdf(report_type, report_data, period)
+            elif format_type == ReportFormat.EXCEL:
+                content, filename, content_type = await self._generate_excel(report_type, report_data, period)
+            elif format_type == ReportFormat.JSON:
+                content, filename, content_type = await self._generate_json(report_type, report_data, period)
+            elif format_type == ReportFormat.HTML:
+                content, filename, content_type = await self._generate_html(report_type, report_data, period)
+            elif format_type == ReportFormat.CSV:
+                content, filename, content_type = await self._generate_csv(report_type, report_data, period)
+            else:
+                raise ValueError(f"Formato {format_type} no soportado")
+            
+            generation_time = (datetime.utcnow() - start_time).total_seconds()
+            
+            logger.info(f"Reporte generado exitosamente en {generation_time:.2f}s")
+            
+            return {
+                "success": True,
+                "filename": filename,
+                "content": content,
+                "content_type": content_type,
+                "size_bytes": len(content),
+                "generation_time_seconds": generation_time,
+                "metadata": {
+                    "report_type": report_type,
+                    "format": format_type,
+                    "period": period,
+                    "generated_at": datetime.utcnow().isoformat(),
+                    "cache_key": self._generate_cache_key(report_type, format_type, period, custom_filters)
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error generando reporte: {str(e)}", exc_info=True)
+            return {
+                "success": False,
+                "error": str(e),
+                "error_type": type(e).__name__
+            }
+    
+    def _validate_report_parameters(self, report_type: ReportType, format_type: ReportFormat, period: str):
+        """Valida los parámetros del reporte"""
+        
+        valid_periods = ["daily", "weekly", "monthly", "quarterly", "yearly"]
+        if period not in valid_periods:
+            raise ValueError(f"Período '{period}' no válido. Use: {', '.join(valid_periods)}")
+        
+        # Verificar formatos soportados por tipo de reporte
+        supported_formats = self.get_report_metadata(report_type).get('supported_formats', [])
+        if format_type.value not in supported_formats:
+            raise ValueError(f"Formato {format_type} no soportado para reporte {report_type}")
+    
+    async def _get_report_data(self, report_type: ReportType, period: str, filters: Optional[Dict], db: Session) -> Dict:
+        """Obtiene datos para el reporte especificado"""
+        
         period_days = {
+            'daily': 1,
             'weekly': 7,
             'monthly': 30,
             'quarterly': 90,
             'yearly': 365
         }.get(period, 30)
         
-        # Obtener datos base
-        if report_type == 'executive':
-            data = await self.analytics_engine.generate_executive_report(period, db)
-        else:
-            # Usar template específico
-            template_func = self.report_templates.get(report_type)
-            if not template_func:
-                raise ValueError(f"Report type '{report_type}' no soportado")
-            
-            data = await template_func(period_days, custom_filters, db)
+        template_func = self.report_templates.get(report_type)
+        if not template_func:
+            raise ValueError(f"Tipo de reporte '{report_type}' no soportado")
         
-        return {
-            "report_type": report_type,
-            "period": period,
-            "generated_at": datetime.utcnow().isoformat(),
-            "data": data,
-            "filters": custom_filters or {},
-            "metadata": {
-                "total_pages": 1,
-                "format": "json",
-                "version": "1.0"
-            }
-        }
+        return await template_func(period_days, filters, db)
     
-    async def generate_pdf_report(self,
-                                report_type: str,
-                                period: str, 
-                                custom_filters: Optional[Dict] = None,
-                                db: Session = None) -> bytes:
+    async def _generate_pdf(self, report_type: ReportType, report_data: Dict, period: str) -> tuple:
         """Genera reporte en formato PDF"""
         
-        # Obtener datos del reporte
-        report_data = await self.generate_custom_report(report_type, period, custom_filters, db)
-        
-        # Crear PDF en memoria
         buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4)
-        story = []
-        
-        # Título del reporte
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=self.styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor(self.company_colors['primary']),
-            spaceAfter=30
+        doc = SimpleDocTemplate(
+            buffer, 
+            pagesize=A4,
+            topMargin=72,
+            rightMargin=72,
+            leftMargin=72,
+            bottomMargin=72
         )
         
-        story.append(Paragraph(f"Reporte {report_type.title()}", title_style))
-        story.append(Paragraph(f"Período: {period} | Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}", 
-                              self.styles['Normal']))
-        story.append(Spacer(1, 20))
-        
-        # Contenido según tipo de reporte
-        if report_type == 'executive':
-            story.extend(self._build_executive_pdf_content(report_data))
-        elif report_type == 'detailed_analytics':
-            story.extend(self._build_detailed_pdf_content(report_data))
-        elif report_type == 'channel_performance':
-            story.extend(self._build_channel_pdf_content(report_data))
-        
-        # Generar PDF
+        story = self._build_pdf_story(report_type, report_data, period)
         doc.build(story)
+        
         pdf_bytes = buffer.getvalue()
         buffer.close()
         
-        return pdf_bytes
+        filename = f"reporte_{report_type.value}_{period}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+        
+        return pdf_bytes, filename, "application/pdf"
+    
+    def _build_pdf_story(self, report_type: ReportType, report_data: Dict, period: str) -> List:
+        """Construye el contenido del PDF"""
+        
+        story = []
+        
+        # Header con logo y información de la compañía
+        story.extend(self._build_pdf_header())
+        
+        # Título del reporte
+        title_text = f"Reporte {self.get_report_metadata(report_type)['name']}"
+        story.append(Paragraph(title_text, self.custom_styles['title']))
+        
+        # Información del período
+        period_text = f"Período: {period.title()} | Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+        story.append(Paragraph(period_text, self.styles['Normal']))
+        story.append(Spacer(1, 20))
+        
+        # Contenido específico del reporte
+        if report_type == ReportType.EXECUTIVE:
+            story.extend(self._build_executive_pdf_content(report_data))
+        elif report_type == ReportType.DETAILED_ANALYTICS:
+            story.extend(self._build_detailed_pdf_content(report_data))
+        elif report_type == ReportType.CHANNEL_PERFORMANCE:
+            story.extend(self._build_channel_pdf_content(report_data))
+        elif report_type == ReportType.LEAD_QUALITY:
+            story.extend(self._build_quality_pdf_content(report_data))
+        
+        # Footer
+        story.append(PageBreak())
+        story.extend(self._build_pdf_footer())
+        
+        return story
+    
+    def _build_pdf_header(self) -> List:
+        """Construye el header del PDF con logo e información de la compañía"""
+        
+        header_elements = []
+        
+        # Intentar cargar logo
+        try:
+            if Path(self.company_config['logo_path']).exists():
+                logo = Image(self.company_config['logo_path'], width=2*inch, height=0.5*inch)
+                logo.hAlign = 'LEFT'
+                header_elements.append(logo)
+        except:
+            pass  # Continuar sin logo si hay error
+        
+        header_elements.extend([
+            Spacer(1, 10),
+            Paragraph(self.company_config['name'], self.styles['Heading2']),
+            Paragraph("Reporte de Analytics", self.styles['Normal']),
+            Spacer(1, 20)
+        ])
+        
+        return header_elements
+    
+    def _build_pdf_footer(self) -> List:
+        """Construye el footer del PDF"""
+        
+        return [
+            Spacer(1, 20),
+            Paragraph("Confidencial - Uso Interno", self.styles['Italic']),
+            Paragraph(f"Generado por {self.company_config['name']}", self.styles['Italic']),
+            Paragraph(f"Contacto: {self.company_config['contact_info']}", self.styles['Italic'])
+        ]
     
     def _build_executive_pdf_content(self, report_data: Dict) -> List:
         """Construye contenido PDF para reporte ejecutivo"""
@@ -135,643 +317,437 @@ class ReportGenerator:
         content = []
         
         # Resumen ejecutivo
-        content.append(Paragraph("Resumen Ejecutivo", self.styles['Heading2']))
+        content.append(Paragraph("Resumen Ejecutivo", self.custom_styles['subtitle']))
         content.append(Spacer(1, 12))
         
-        # KPIs principales
-        kpis = report_data['data'].get('summary', {}).get('kpi_summary', {})
+        # KPIs en formato tarjetas
+        kpis = report_data.get('summary', {}).get('kpi_summary', {})
+        if kpis:
+            kpi_table_data = self._create_kpi_table_data(kpis)
+            kpi_table = Table(kpi_table_data, colWidths=[150, 100, 80])
+            kpi_table.setStyle(self._get_kpi_table_style())
+            content.append(kpi_table)
+            content.append(Spacer(1, 20))
         
-        # Crear tabla de KPIs
-        kpi_data = [['Métrica', 'Valor', 'Cambio']]
+        # Insights y recomendaciones
+        content.extend(self._build_insights_section(report_data))
         
-        for kpi_name, kpi_data_item in kpis.items():
-            value = kpi_data_item.get('value', 0)
-            change = kpi_data_item.get('change', 0)
+        return content
+    
+    def _create_kpi_table_data(self, kpis: Dict) -> List:
+        """Crea datos para tabla de KPIs"""
+        
+        table_data = [['Métrica', 'Valor', 'Cambio']]
+        
+        kpi_formatters = {
+            'conversion_rate': lambda v: f"{v:.1%}",
+            'roi': lambda v: f"{v:.0f}%",
+            'revenue_attributed': lambda v: f"${v:,.0f}",
+            'cost_per_lead': lambda v: f"${v:.2f}",
+            'response_time': lambda v: f"{v:.1f}s",
+            'default': lambda v: f"{v:,.0f}"
+        }
+        
+        for kpi_name, kpi_data in kpis.items():
+            value = kpi_data.get('value', 0)
+            change = kpi_data.get('change', 0)
             
-            # Formatear valores según el tipo
-            if kpi_name in ['conversion_rate', 'roi']:
-                formatted_value = f"{value:.1%}"
-                formatted_change = f"{change:+.1f}%"
-            elif kpi_name in ['revenue_attributed', 'cost_per_lead']:
-                formatted_value = f"${value:,.0f}"
-                formatted_change = f"{change:+.1f}%"
-            elif kpi_name == 'response_time':
-                formatted_value = f"{value:.1f}s"
-                formatted_change = f"{change:+.1f}%"
-            else:
-                formatted_value = f"{value:,.0f}"
-                formatted_change = f"{change:+.1f}%"
+            formatter = kpi_formatters.get(kpi_name, kpi_formatters['default'])
+            formatted_value = formatter(value)
+            formatted_change = f"{change:+.1f}%"
             
-            kpi_data.append([
+            table_data.append([
                 kpi_name.replace('_', ' ').title(),
                 formatted_value,
                 formatted_change
             ])
         
-        kpi_table = Table(kpi_data)
-        kpi_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(self.company_colors['primary'])),
+        return table_data
+    
+    def _get_kpi_table_style(self) -> TableStyle:
+        """Retorna estilo para tabla de KPIs"""
+        
+        return TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(self.company_config['colors']['primary'])),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 12),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor(self.company_config['colors']['light'])),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F8FAFC')])
+        ])
+    
+    def _build_insights_section(self, report_data: Dict) -> List:
+        """Construye sección de insights y recomendaciones"""
         
-        content.append(kpi_table)
-        content.append(Spacer(1, 20))
+        content = []
         
-        # Insights
-        insights = report_data['data'].get('insights', [])
+        insights = report_data.get('insights', [])
         if insights:
-            content.append(Paragraph("Insights Principales", self.styles['Heading2']))
+            content.append(Paragraph("Insights Principales", self.custom_styles['subtitle']))
             content.append(Spacer(1, 12))
             
-            for insight in insights[:3]:  # Top 3 insights
-                bullet_text = f"• <b>{insight['title']}:</b> {insight['description']}"
-                content.append(Paragraph(bullet_text, self.styles['Normal']))
-                content.append(Spacer(1, 6))
+            for i, insight in enumerate(insights[:5], 1):
+                insight_text = f"<b>{i}. {insight['title']}:</b> {insight['description']}"
+                if insight.get('impact'):
+                    insight_text += f" <i>(Impacto: {insight['impact']})</i>"
+                
+                content.append(Paragraph(insight_text, self.styles['Normal']))
+                content.append(Spacer(1, 8))
         
-        # Recomendaciones
-        recommendations = report_data['data'].get('recommendations', [])
+        recommendations = report_data.get('recommendations', [])
         if recommendations:
             content.append(Spacer(1, 20))
-            content.append(Paragraph("Recomendaciones", self.styles['Heading2']))
+            content.append(Paragraph("Recomendaciones", self.custom_styles['subtitle']))
             content.append(Spacer(1, 12))
             
-            for rec in recommendations[:3]:
-                bullet_text = f"• <b>{rec['title']}:</b> {rec['description']}"
-                content.append(Paragraph(bullet_text, self.styles['Normal']))
-                content.append(Spacer(1, 6))
-        
-        return content
-    
-    def _build_detailed_pdf_content(self, report_data: Dict) -> List:
-        """Construye contenido PDF para reporte detallado"""
-        
-        content = []
-        
-        # Análisis detallado
-        content.append(Paragraph("Análisis Detallado", self.styles['Heading2']))
-        content.append(Spacer(1, 12))
-        
-        # Funnel de conversión
-        funnel_data = report_data['data'].get('lead_funnel', {})
-        if funnel_data:
-            content.append(Paragraph("Funnel de Conversión", self.styles['Heading3']))
-            
-            stages = funnel_data.get('stages', {})
-            funnel_table_data = [['Etapa', 'Cantidad', 'Tasa de Conversión']]
-            
-            stage_names = {
-                'captured': 'Capturados',
-                'engaged': 'Comprometidos', 
-                'qualified': 'Calificados',
-                'converted': 'Convertidos'
-            }
-            
-            for stage, count in stages.items():
-                stage_name = stage_names.get(stage, stage.title())
-                # Calcular conversion rate (mock)
-                conversion_rate = count / stages.get('captured', 1) if stages.get('captured') else 0
+            for i, rec in enumerate(recommendations[:5], 1):
+                rec_text = f"<b>{i}. {rec['title']}:</b> {rec['description']}"
+                if rec.get('priority'):
+                    rec_text += f" <i>(Prioridad: {rec['priority']})</i>"
                 
-                funnel_table_data.append([
-                    stage_name,
-                    f"{count:,}",
-                    f"{conversion_rate:.1%}"
-                ])
-            
-            funnel_table = Table(funnel_table_data)
-            funnel_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(self.company_colors['secondary'])),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black)
-            ]))
-            
-            content.append(funnel_table)
-            content.append(Spacer(1, 20))
+                content.append(Paragraph(rec_text, self.styles['Normal']))
+                content.append(Spacer(1, 8))
         
         return content
     
-    def _build_channel_pdf_content(self, report_data: Dict) -> List:
-        """Construye contenido PDF para reporte de canales"""
-        
-        content = []
-        
-        # Performance por canal
-        content.append(Paragraph("Performance por Canal", self.styles['Heading2']))
-        content.append(Spacer(1, 12))
-        
-        channels = report_data['data'].get('channel_performance', [])
-        if channels:
-            channel_table_data = [['Canal', 'Leads', 'Conversiones', 'ROI', 'Costo por Lead']]
-            
-            for channel in channels[:5]:  # Top 5 channels
-                channel_table_data.append([
-                    channel.get('channel', 'Unknown'),
-                    f"{channel.get('leads_count', 0):,}",
-                    f"{channel.get('conversions', 0):,}",
-                    f"{channel.get('roi', 0):.0f}%",
-                    f"${channel.get('cost_per_lead', 0):.2f}"
-                ])
-            
-            channel_table = Table(channel_table_data)
-            channel_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(self.company_colors['accent'])),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black)
-            ]))
-            
-            content.append(channel_table)
-        
-        return content
-    
-    async def generate_excel_report(self,
-                                  report_type: str,
-                                  period: str,
-                                  custom_filters: Optional[Dict] = None,
-                                  db: Session = None) -> bytes:
+    async def _generate_excel(self, report_type: ReportType, report_data: Dict, period: str) -> tuple:
         """Genera reporte en formato Excel"""
         
-        # Obtener datos del reporte
-        report_data = await self.generate_custom_report(report_type, period, custom_filters, db)
-        
-        # Crear workbook en memoria
-        buffer = io.BytesIO()
         workbook = Workbook()
         
-        # Hoja principal - Resumen
+        # Hoja de resumen
         ws_summary = workbook.active
         ws_summary.title = "Resumen"
+        self._build_excel_summary_sheet(ws_summary, report_type, report_data, period)
+        
+        # Hojas adicionales según tipo de reporte
+        if report_type == ReportType.EXECUTIVE:
+            self._build_excel_kpi_sheet(workbook, report_data)
+            self._build_excel_insights_sheet(workbook, report_data)
+        elif report_type == ReportType.CHANNEL_PERFORMANCE:
+            self._build_excel_channels_sheet(workbook, report_data)
+            self._build_excel_attribution_sheet(workbook, report_data)
+        
+        # Guardar en buffer
+        buffer = io.BytesIO()
+        workbook.save(buffer)
+        excel_bytes = buffer.getvalue()
+        buffer.close()
+        
+        filename = f"reporte_{report_type.value}_{period}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+        
+        return excel_bytes, filename, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    
+    def _build_excel_summary_sheet(self, worksheet, report_type: ReportType, report_data: Dict, period: str):
+        """Construye hoja de resumen en Excel"""
         
         # Estilos
+        title_font = Font(size=16, bold=True, color="FFFFFF")
         header_font = Font(bold=True, color="FFFFFF")
-        header_fill = PatternFill(start_color="3B82F6", end_color="3B82F6", fill_type="solid")
+        title_fill = PatternFill(start_color=self.company_config['colors']['primary'], fill_type="solid")
+        header_fill = PatternFill(start_color=self.company_config['colors']['secondary'], fill_type="solid")
         
         # Título
-        ws_summary['A1'] = f"Reporte {report_type.title()}"
-        ws_summary['A1'].font = Font(size=16, bold=True)
-        ws_summary['A2'] = f"Período: {period}"
-        ws_summary['A3'] = f"Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+        worksheet.merge_cells('A1:D1')
+        worksheet['A1'] = f"Reporte {self.get_report_metadata(report_type)['name']}"
+        worksheet['A1'].font = title_font
+        worksheet['A1'].fill = title_fill
+        worksheet['A1'].alignment = Alignment(horizontal='center')
         
-        # KPIs (si es reporte ejecutivo)
-        if report_type == 'executive':
-            kpis = report_data['data'].get('summary', {}).get('kpi_summary', {})
-            
-            # Headers
-            ws_summary['A5'] = "Métrica"
-            ws_summary['B5'] = "Valor" 
-            ws_summary['C5'] = "Cambio %"
-            
-            for cell in ['A5', 'B5', 'C5']:
-                ws_summary[cell].font = header_font
-                ws_summary[cell].fill = header_fill
-                ws_summary[cell].alignment = Alignment(horizontal='center')
-            
-            # Datos de KPIs
-            row = 6
-            for kpi_name, kpi_data_item in kpis.items():
-                ws_summary[f'A{row}'] = kpi_name.replace('_', ' ').title()
-                ws_summary[f'B{row}'] = kpi_data_item.get('value', 0)
-                ws_summary[f'C{row}'] = kpi_data_item.get('change', 0)
-                row += 1
-            
-            # Crear gráfico de KPIs
-            self._add_excel_chart(ws_summary, "KPIs Principales", 5, row-1)
+        worksheet['A2'] = f"Período: {period.title()}"
+        worksheet['A3'] = f"Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
         
-        # Hoja de canales (si hay datos)
-        channels = report_data['data'].get('channel_performance', [])
-        if channels:
-            ws_channels = workbook.create_sheet(title="Canales")
-            
+        # KPIs principales
+        kpis = report_data.get('summary', {}).get('kpi_summary', {})
+        if kpis:
             # Headers
-            headers = ['Canal', 'Leads', 'Conversiones', 'Tasa Conv.', 'ROI', 'Costo/Lead']
+            headers = ['Métrica', 'Valor Actual', 'Valor Anterior', 'Cambio %']
             for col, header in enumerate(headers, 1):
-                cell = ws_channels.cell(row=1, column=col)
+                cell = worksheet.cell(row=5, column=col)
                 cell.value = header
                 cell.font = header_font
                 cell.fill = header_fill
                 cell.alignment = Alignment(horizontal='center')
             
-            # Datos de canales
-            for row, channel in enumerate(channels, 2):
-                ws_channels.cell(row=row, column=1).value = channel.get('channel', 'Unknown')
-                ws_channels.cell(row=row, column=2).value = channel.get('leads_count', 0)
-                ws_channels.cell(row=row, column=3).value = channel.get('conversions', 0)
-                ws_channels.cell(row=row, column=4).value = channel.get('conversion_rate', 0)
-                ws_channels.cell(row=row, column=5).value = channel.get('roi', 0)
-                ws_channels.cell(row=row, column=6).value = channel.get('cost_per_lead', 0)
+            # Datos
+            row = 6
+            for kpi_name, kpi_data in kpis.items():
+                worksheet.cell(row=row, column=1).value = kpi_name.replace('_', ' ').title()
+                worksheet.cell(row=row, column=2).value = kpi_data.get('value', 0)
+                worksheet.cell(row=row, column=3).value = kpi_data.get('previous_value', 0)
+                worksheet.cell(row=row, column=4).value = kpi_data.get('change', 0)
+                row += 1
             
-            # Crear gráfico de canales
-            chart = BarChart()
-            chart.type = "col"
-            chart.style = 10
-            chart.title = "Performance por Canal"
-            chart.y_axis.title = 'Leads'
-            chart.x_axis.title = 'Canal'
-            
-            data = Reference(ws_channels, min_col=2, min_row=1, max_row=len(channels)+1, max_col=2)
-            cats = Reference(ws_channels, min_col=1, min_row=2, max_row=len(channels)+1)
-            
-            chart.add_data(data, titles_from_data=True)
-            chart.set_categories(cats)
-            chart.height = 10
-            chart.width = 15
-            
-            ws_channels.add_chart(chart, "H2")
-        
-        # Guardar en buffer
-        workbook.save(buffer)
-        excel_bytes = buffer.getvalue()
-        buffer.close()
-        
-        return excel_bytes
+            # Ajustar anchos de columna
+            worksheet.column_dimensions['A'].width = 25
+            worksheet.column_dimensions['B'].width = 15
+            worksheet.column_dimensions['C'].width = 15
+            worksheet.column_dimensions['D'].width = 12
     
-    def _add_excel_chart(self, worksheet, title: str, start_row: int, end_row: int):
-        """Agrega un gráfico a la hoja de Excel"""
+    async def _generate_json(self, report_type: ReportType, report_data: Dict, period: str) -> tuple:
+        """Genera reporte en formato JSON"""
         
-        chart = LineChart()
-        chart.title = title
-        chart.style = 13
-        chart.y_axis.title = 'Valor'
-        chart.x_axis.title = 'Métrica'
+        json_data = {
+            "metadata": {
+                "report_type": report_type.value,
+                "period": period,
+                "generated_at": datetime.utcnow().isoformat(),
+                "version": "1.0"
+            },
+            "data": report_data
+        }
         
-        data = Reference(worksheet, min_col=2, min_row=start_row, max_row=end_row)
-        cats = Reference(worksheet, min_col=1, min_row=start_row+1, max_row=end_row)
+        json_bytes = json.dumps(json_data, indent=2, ensure_ascii=False).encode('utf-8')
+        filename = f"reporte_{report_type.value}_{period}_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
         
-        chart.add_data(data, titles_from_data=True)
-        chart.set_categories(cats)
-        chart.height = 10
-        chart.width = 15
+        return json_bytes, filename, "application/json"
+    
+    async def _generate_html(self, report_type: ReportType, report_data: Dict, period: str) -> tuple:
+        """Genera reporte en formato HTML"""
         
-        worksheet.add_chart(chart, f"E{start_row}")
+        html_template = self._get_html_template(report_type)
+        html_content = html_template.format(
+            report_title=self.get_report_metadata(report_type)['name'],
+            period=period,
+            generated_date=datetime.now().strftime('%d/%m/%Y %H:%M'),
+            company_name=self.company_config['name'],
+            report_data=json.dumps(report_data, indent=2)
+        )
+        
+        html_bytes = html_content.encode('utf-8')
+        filename = f"reporte_{report_type.value}_{period}_{datetime.now().strftime('%Y%m%d_%H%M')}.html"
+        
+        return html_bytes, filename, "text/html"
+    
+    async def _generate_csv(self, report_type: ReportType, report_data: Dict, period: str) -> tuple:
+        """Genera reporte en formato CSV"""
+        
+        # Convertir datos a DataFrame y luego a CSV
+        flat_data = self._flatten_report_data(report_data)
+        df = pd.DataFrame([flat_data])
+        
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_bytes = csv_buffer.getvalue().encode('utf-8')
+        csv_buffer.close()
+        
+        filename = f"reporte_{report_type.value}_{period}_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+        
+        return csv_bytes, filename, "text/csv"
+    
+    def _flatten_report_data(self, data: Dict, parent_key: str = '', sep: str = '_') -> Dict:
+        """Aplana datos anidados para CSV"""
+        items = []
+        for k, v in data.items():
+            new_key = f"{parent_key}{sep}{k}" if parent_key else k
+            if isinstance(v, dict):
+                items.extend(self._flatten_report_data(v, new_key, sep=sep).items())
+            elif isinstance(v, list):
+                # Para listas, convertimos a string JSON
+                items.append((new_key, json.dumps(v)))
+            else:
+                items.append((new_key, v))
+        return dict(items)
+    
+    def _get_html_template(self, report_type: ReportType) -> str:
+        """Retorna template HTML para el reporte"""
+        
+        return f"""
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Reporte {self.get_report_metadata(report_type)['name']}</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 40px; }}
+                .header {{ background-color: {self.company_config['colors']['primary']}; color: white; padding: 20px; }}
+                .content {{ margin: 20px 0; }}
+                .kpi {{ border: 1px solid #ddd; padding: 15px; margin: 10px 0; }}
+                .positive {{ color: green; }}
+                .negative {{ color: red; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>{{report_title}}</h1>
+                <p>Período: {{period}} | Generado: {{generated_date}}</p>
+                <p>Compañía: {{company_name}}</p>
+            </div>
+            <div class="content">
+                <pre>{{report_data}}</pre>
+            </div>
+        </body>
+        </html>
+        """
     
     async def generate_and_send_report(self,
-                                     report_type: str,
+                                     report_type: ReportType,
+                                     format_type: ReportFormat,
                                      period: str,
-                                     format_type: str,
-                                     email_recipients: Optional[List[str]] = None,
+                                     email_recipients: List[str],
                                      custom_filters: Optional[Dict] = None,
-                                     db: Session = None):
-        """Genera reporte y lo envía por email"""
+                                     db: Session = None) -> Dict[str, Any]:
+        """Genera y envía reporte por email"""
         
         try:
-            # Generar reporte según formato
-            if format_type == 'pdf':
-                report_bytes = await self.generate_pdf_report(report_type, period, custom_filters, db)
-                filename = f"reporte_{report_type}_{period}_{datetime.now().strftime('%Y%m%d')}.pdf"
-                content_type = "application/pdf"
-                
-            elif format_type == 'excel':
-                report_bytes = await self.generate_excel_report(report_type, period, custom_filters, db)
-                filename = f"reporte_{report_type}_{period}_{datetime.now().strftime('%Y%m%d')}.xlsx"
-                content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                
-            else:
-                raise ValueError(f"Formato {format_type} no soportado")
+            # Generar reporte
+            result = await self.generate_report(report_type, format_type, period, custom_filters, db)
             
-            # Enviar por email si hay destinatarios
-            if email_recipients:
-                await self._send_report_email(
-                    report_bytes, 
-                    filename, 
-                    content_type,
-                    email_recipients,
-                    report_type,
-                    period
-                )
+            if not result['success']:
+                return result
             
-            return {
-                "success": True,
-                "filename": filename,
-                "size_bytes": len(report_bytes),
-                "recipients": email_recipients
-            }
+            # Enviar por email
+            email_result = await self.email_service.send_report_email(
+                recipients=email_recipients,
+                subject=f"Reporte {self.get_report_metadata(report_type)['name']} - {period.title()}",
+                body=self._get_email_body(report_type, period),
+                attachment_content=result['content'],
+                attachment_filename=result['filename'],
+                attachment_content_type=result['content_type'],
+                db=db
+            )
+            
+            result['email_result'] = email_result
+            return result
             
         except Exception as e:
-            print(f"❌ Error generando/enviando reporte: {e}")
+            logger.error(f"Error enviando reporte por email: {str(e)}")
             return {
                 "success": False,
                 "error": str(e)
             }
     
-    async def _send_report_email(self,
-                               report_bytes: bytes,
-                               filename: str,
-                               content_type: str,
-                               recipients: List[str],
-                               report_type: str,
-                               period: str):
-        """Envía reporte por email usando SendGrid"""
+    def _get_email_body(self, report_type: ReportType, period: str) -> str:
+        """Genera cuerpo del email para el reporte"""
         
-        # En producción, integrar con SendGrid
-        # Por ahora, mock del envío
+        metadata = self.get_report_metadata(report_type)
         
-        print(f"📧 Enviando reporte {filename} a {len(recipients)} destinatarios")
-        print(f"   Tipo: {report_type}, Período: {period}")
-        print(f"   Tamaño: {len(report_bytes):,} bytes")
-        print(f"   Destinatarios: {', '.join(recipients)}")
-        
-        # TODO: Implementar envío real con SendGrid
-        # from sendgrid import SendGridAPIClient
-        # from sendgrid.helpers.mail import Mail, Attachment
-        
-        return True
+        return f"""
+        <h2>Reporte {metadata['name']}</h2>
+        <p>Se adjunta el reporte {metadata['name']} para el período {period}.</p>
+        <p><strong>Descripción:</strong> {metadata['description']}</p>
+        <p>Este reporte fue generado automáticamente el {datetime.now().strftime('%d/%m/%Y a las %H:%M')}.</p>
+        <p>Si tiene alguna pregunta, no dude en contactarnos.</p>
+        <br>
+        <p>Saludos cordiales,<br>{self.company_config['name']}</p>
+        """
     
-    # Template functions para diferentes tipos de reporte
-    
-    async def _executive_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
-        """Template para reporte ejecutivo"""
-        
-        return await self.analytics_engine.generate_executive_report(
-            "monthly" if days >= 30 else "weekly", db
-        )
-    
-    async def _detailed_analytics_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
-        """Template para reporte de analytics detallado"""
-        
-        dashboard_data = await self.analytics_engine.get_executive_dashboard(days, db)
-        
-        # Agregar análisis detallados específicos
-        detailed_data = {
-            **dashboard_data,
-            "funnel_analysis": await self.analytics_engine.get_detailed_analytics(
-                "conversion_funnel", days, "daily", filters, db
-            ),
-            "quality_breakdown": await self.analytics_engine.get_detailed_analytics(
-                "lead_quality_breakdown", days, "daily", filters, db
-            ),
-            "engagement_metrics": await self.analytics_engine.get_detailed_analytics(
-                "engagement_metrics", days, "daily", filters, db
-            )
-        }
-        
-        return detailed_data
-    
-    async def _channel_performance_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
-        """Template para reporte de performance por canal"""
-        
-        dashboard_data = await self.analytics_engine.get_executive_dashboard(days, db)
-        
-        # Enfoque específico en canales
-        channel_data = {
-            "channel_performance": dashboard_data.get("channel_performance", []),
-            "channel_trends": await self._get_channel_trends(days, db),
-            "attribution_analysis": await self.analytics_engine.get_detailed_analytics(
-                "channel_attribution", days, "daily", filters, db
-            ),
-            "cost_analysis": await self._get_cost_analysis_by_channel(days, db)
-        }
-        
-        return channel_data
-    
-    async def _lead_quality_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
-        """Template para reporte de calidad de leads"""
-        
-        quality_data = await self.analytics_engine.get_detailed_analytics(
-            "lead_quality_breakdown", days, "daily", filters, db
-        )
-        
-        # Agregar análisis específicos de calidad
-        enhanced_quality_data = {
-            **quality_data,
-            "scoring_distribution": await self._get_scoring_distribution(days, db),
-            "source_quality_comparison": await self._get_source_quality_comparison(days, db),
-            "quality_trends": await self._get_quality_trends(days, db)
-        }
-        
-        return enhanced_quality_data
-    
-    # Funciones auxiliares para análisis específicos
-    
-    async def _get_channel_trends(self, days: int, db: Session) -> Dict:
-        """Obtiene tendencias de performance por canal"""
-        
-        since_date = datetime.utcnow() - timedelta(days=days)
-        
-        # Query para obtener datos diarios por canal
-        from ...models.lead import Lead
-        from sqlalchemy import func
-        
-        daily_channel_data = db.query(
-            func.date(Lead.created_at).label('date'),
-            Lead.source,
-            func.count(Lead.id).label('leads'),
-            func.avg(Lead.score).label('avg_score')
-        ).filter(Lead.created_at > since_date)\
-         .group_by(func.date(Lead.created_at), Lead.source)\
-         .order_by(func.date(Lead.created_at))\
-         .all()
-        
-        # Procesar datos para tendencias
-        trends = {}
-        for date, source, leads, avg_score in daily_channel_data:
-            if source not in trends:
-                trends[source] = {
-                    "dates": [],
-                    "leads": [],
-                    "avg_scores": []
-                }
-            
-            trends[source]["dates"].append(date.isoformat())
-            trends[source]["leads"].append(leads)
-            trends[source]["avg_scores"].append(float(avg_score) if avg_score else 0)
-        
-        return trends
-    
-    async def _get_cost_analysis_by_channel(self, days: int, db: Session) -> Dict:
-        """Análisis de costos por canal"""
-        
-        # Mock data - en producción integrar con ad APIs
-        channels = ['meta_ads', 'google_ads', 'linkedin_ads', 'organic']
-        
-        cost_analysis = {}
-        for channel in channels:
-            cost_analysis[channel] = {
-                "total_spend": days * 100,  # $100/day mock
-                "cost_per_lead": 25,
-                "cost_per_conversion": 100,
-                "budget_utilization": 0.85,
-                "efficiency_score": 0.75
-            }
-        
-        return cost_analysis
-    
-    async def _get_scoring_distribution(self, days: int, db: Session) -> Dict:
-        """Distribución de scoring de leads"""
-        
-        since_date = datetime.utcnow() - timedelta(days=days)
-        
-        from ...models.lead import Lead
-        from sqlalchemy import func, case
-        
-        # Query para distribución de scores
-        score_distribution = db.query(
-            func.sum(case([(Lead.score.between(0, 25), 1)], else_=0)).label('low'),
-            func.sum(case([(Lead.score.between(26, 50), 1)], else_=0)).label('medium_low'),
-            func.sum(case([(Lead.score.between(51, 75), 1)], else_=0)).label('medium_high'),
-            func.sum(case([(Lead.score.between(76, 100), 1)], else_=0)).label('high')
-        ).filter(Lead.created_at > since_date).first()
-        
-        return {
-            "0-25": score_distribution.low or 0,
-            "26-50": score_distribution.medium_low or 0,
-            "51-75": score_distribution.medium_high or 0,
-            "76-100": score_distribution.high or 0
-        }
-    
-    async def _get_source_quality_comparison(self, days: int, db: Session) -> Dict:
-        """Comparación de calidad por fuente"""
-        
-        since_date = datetime.utcnow() - timedelta(days=days)
-        
-        from ...models.lead import Lead
-        from sqlalchemy import func
-        
-        source_quality = db.query(
-            Lead.source,
-            func.avg(Lead.score).label('avg_score'),
-            func.count(Lead.id).label('total_leads'),
-            func.sum(func.case([(Lead.score >= 70, 1)], else_=0)).label('high_quality_leads')
-        ).filter(Lead.created_at > since_date)\
-         .group_by(Lead.source)\
-         .all()
-        
-        comparison = {}
-        for source, avg_score, total_leads, high_quality in source_quality:
-            comparison[source or 'unknown'] = {
-                "avg_score": float(avg_score) if avg_score else 0,
-                "total_leads": total_leads,
-                "high_quality_leads": high_quality,
-                "quality_rate": high_quality / total_leads if total_leads > 0 else 0
-            }
-        
-        return comparison
-    
-    async def _get_quality_trends(self, days: int, db: Session) -> Dict:
-        """Tendencias de calidad de leads"""
-        
-        since_date = datetime.utcnow() - timedelta(days=days)
-        
-        from ...models.lead import Lead
-        from sqlalchemy import func
-        
-        daily_quality = db.query(
-            func.date(Lead.created_at).label('date'),
-            func.avg(Lead.score).label('avg_score'),
-            func.count(Lead.id).label('total_leads')
-        ).filter(Lead.created_at > since_date)\
-         .group_by(func.date(Lead.created_at))\
-         .order_by(func.date(Lead.created_at))\
-         .all()
-        
-        dates = []
-        avg_scores = []
-        lead_counts = []
-        
-        for date, avg_score, total_leads in daily_quality:
-            dates.append(date.isoformat())
-            avg_scores.append(float(avg_score) if avg_score else 0)
-            lead_counts.append(total_leads)
-        
-        return {
-            "dates": dates,
-            "avg_scores": avg_scores,
-            "lead_counts": lead_counts
-        }
-    
-    def create_visualization(self, data: Dict, chart_type: str, title: str) -> str:
-        """Crea visualización usando matplotlib y retorna base64"""
-        
-        plt.figure(figsize=(10, 6))
-        
-        if chart_type == 'line':
-            plt.plot(data.get('x', []), data.get('y', []))
-        elif chart_type == 'bar':
-            plt.bar(data.get('x', []), data.get('y', []))
-        elif chart_type == 'pie':
-            plt.pie(data.get('values', []), labels=data.get('labels', []))
-        
-        plt.title(title)
-        plt.tight_layout()
-        
-        # Convertir a base64
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=300, bbox_inches='tight')
-        buffer.seek(0)
-        
-        image_base64 = base64.b64encode(buffer.getvalue()).decode()
-        buffer.close()
-        plt.close()
-        
-        return image_base64
-    
-    def get_report_metadata(self, report_type: str) -> Dict[str, Any]:
+    def get_report_metadata(self, report_type: ReportType) -> Dict[str, Any]:
         """Obtiene metadatos de un tipo de reporte"""
         
         metadata = {
-            'executive': {
-                'name': 'Reporte Ejecutivo',
-                'description': 'Resumen ejecutivo con KPIs principales',
-                'sections': ['kpis', 'insights', 'recommendations', 'forecast'],
+            ReportType.EXECUTIVE: {
+                'name': 'Ejecutivo',
+                'description': 'Resumen ejecutivo con KPIs principales y insights',
+                'sections': ['kpis', 'insights', 'recommendations'],
                 'estimated_generation_time': '30-60 segundos',
-                'supported_formats': ['json', 'pdf', 'excel']
+                'supported_formats': ['json', 'pdf', 'excel', 'html'],
+                'audience': 'Ejecutivos, Gerentes'
             },
-            'detailed_analytics': {
+            ReportType.DETAILED_ANALYTICS: {
                 'name': 'Analytics Detallado',
-                'description': 'Análisis profundo de todas las métricas',
+                'description': 'Análisis profundo de todas las métricas y tendencias',
                 'sections': ['funnel', 'quality', 'engagement', 'trends'],
                 'estimated_generation_time': '60-90 segundos',
-                'supported_formats': ['json', 'pdf', 'excel']
+                'supported_formats': ['json', 'pdf', 'excel'],
+                'audience': 'Analistas, Equipo de Marketing'
             },
-            'channel_performance': {
+            ReportType.CHANNEL_PERFORMANCE: {
                 'name': 'Performance por Canal',
-                'description': 'Análisis detallado de ROI y performance',
+                'description': 'Análisis detallado de ROI y performance por canal',
                 'sections': ['channels', 'attribution', 'costs', 'trends'],
                 'estimated_generation_time': '45-75 segundos',
-                'supported_formats': ['json', 'pdf', 'excel']
+                'supported_formats': ['json', 'pdf', 'excel', 'csv'],
+                'audience': 'Equipo de Marketing, Media Buyers'
             },
-            'lead_quality': {
+            ReportType.LEAD_QUALITY: {
                 'name': 'Calidad de Leads',
-                'description': 'Análisis de scoring y segmentación',
+                'description': 'Análisis de scoring, segmentación y calidad',
                 'sections': ['scoring', 'sources', 'trends', 'recommendations'],
                 'estimated_generation_time': '30-45 segundos',
-                'supported_formats': ['json', 'pdf']
+                'supported_formats': ['json', 'pdf', 'excel'],
+                'audience': 'Equipo de Ventas, Marketing'
             }
         }
         
         return metadata.get(report_type, {})
     
+    def get_available_reports(self) -> List[Dict[str, Any]]:
+        """Retorna lista de reportes disponibles"""
+        
+        reports = []
+        for report_type in ReportType:
+            metadata = self.get_report_metadata(report_type)
+            reports.append({
+                'type': report_type.value,
+                'name': metadata['name'],
+                'description': metadata['description'],
+                'supported_formats': metadata['supported_formats'],
+                'audience': metadata['audience'],
+                'estimated_generation_time': metadata['estimated_generation_time']
+            })
+        
+        return reports
+    
+    def _generate_cache_key(self, report_type: ReportType, format_type: ReportFormat, 
+                          period: str, filters: Optional[Dict]) -> str:
+        """Genera clave única para cache"""
+        
+        filter_str = json.dumps(filters, sort_keys=True) if filters else "no_filters"
+        return f"report:{report_type.value}:{format_type.value}:{period}:{filter_str}"
+    
     async def schedule_recurring_report(self, 
                                       report_config: Dict,
-                                      schedule: str,  # daily, weekly, monthly
-                                      recipients: List[str]) -> Dict[str, Any]:
+                                      schedule: str,
+                                      recipients: List[str],
+                                      db: Session = None) -> Dict[str, Any]:
         """Programa reporte recurrente"""
         
-        # En producción, integrar con Celery Beat
-        scheduled_report = {
-            "id": f"scheduled_{datetime.utcnow().timestamp()}",
-            "report_type": report_config.get("type"),
-            "period": report_config.get("period"),
-            "format": report_config.get("format"),
-            "schedule": schedule,
-            "recipients": recipients,
-            "next_execution": self._calculate_next_execution(schedule),
-            "is_active": True,
-            "created_at": datetime.utcnow().isoformat()
-        }
-        
-        return {
-            "success": True,
-            "scheduled_report": scheduled_report,
-            "message": f"Reporte programado {schedule} creado exitosamente"
-        }
+        try:
+            # Validar configuración
+            required_fields = ['type', 'format', 'period']
+            for field in required_fields:
+                if field not in report_config:
+                    raise ValueError(f"Campo requerido faltante: {field}")
+            
+            report_type = ReportType(report_config['type'])
+            format_type = ReportFormat(report_config['format'])
+            
+            # Crear entrada de reporte programado
+            scheduled_report = {
+                "id": f"sched_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+                "report_type": report_type.value,
+                "format": format_type.value,
+                "period": report_config['period'],
+                "schedule": schedule,
+                "recipients": recipients,
+                "filters": report_config.get('filters', {}),
+                "next_execution": self._calculate_next_execution(schedule),
+                "is_active": True,
+                "created_at": datetime.utcnow().isoformat(),
+                "created_by": "api"
+            }
+            
+            # En producción, guardar en base de datos
+            # await self._save_scheduled_report(scheduled_report, db)
+            
+            logger.info(f"Reporte recurrente programado: {scheduled_report['id']}")
+            
+            return {
+                "success": True,
+                "scheduled_report": scheduled_report,
+                "message": f"Reporte programado {schedule} creado exitosamente"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error programando reporte recurrente: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
     
     def _calculate_next_execution(self, schedule: str) -> str:
         """Calcula próxima ejecución según schedule"""
@@ -779,18 +755,102 @@ class ReportGenerator:
         now = datetime.utcnow()
         
         if schedule == 'daily':
-            next_exec = now.replace(hour=8, minute=0, second=0) + timedelta(days=1)
+            next_exec = now.replace(hour=8, minute=0, second=0, microsecond=0)
+            if next_exec <= now:
+                next_exec += timedelta(days=1)
         elif schedule == 'weekly':
             days_until_monday = (7 - now.weekday()) % 7
-            next_exec = now.replace(hour=8, minute=0, second=0) + timedelta(days=days_until_monday)
+            next_exec = now.replace(hour=8, minute=0, second=0, microsecond=0) + timedelta(days=days_until_monday)
         elif schedule == 'monthly':
-            if now.day == 1:
-                next_exec = now.replace(day=1, hour=8, minute=0, second=0) + timedelta(days=32)
-                next_exec = next_exec.replace(day=1)
-            else:
-                next_exec = now.replace(day=1, hour=8, minute=0, second=0) + timedelta(days=32)
-                next_exec = next_exec.replace(day=1)
+            next_exec = now.replace(day=1, hour=8, minute=0, second=0, microsecond=0)
+            if next_exec <= now:
+                next_exec = (next_exec + timedelta(days=32)).replace(day=1)
         else:
-            next_exec = now + timedelta(days=1)
+            raise ValueError(f"Schedule no soportado: {schedule}")
         
         return next_exec.isoformat()
+    
+    # Métodos de template (simplificados para el ejemplo)
+    async def _executive_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
+        return await self.analytics_engine.generate_executive_report(
+            "monthly" if days >= 30 else "weekly", db
+        )
+    
+    async def _detailed_analytics_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
+        return {"data": "detailed_analytics_placeholder"}
+    
+    async def _channel_performance_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
+        return {"data": "channel_performance_placeholder"}
+    
+    async def _lead_quality_template(self, days: int, filters: Optional[Dict], db: Session) -> Dict:
+        return {"data": "lead_quality_placeholder"}
+    
+    # Métodos de construcción de contenido PDF (simplificados)
+    def _build_detailed_pdf_content(self, report_data: Dict) -> List:
+        return [Paragraph("Contenido detallado placeholder", self.styles['Normal'])]
+    
+    def _build_channel_pdf_content(self, report_data: Dict) -> List:
+        return [Paragraph("Contenido canales placeholder", self.styles['Normal'])]
+    
+    def _build_quality_pdf_content(self, report_data: Dict) -> List:
+        return [Paragraph("Contenido calidad placeholder", self.styles['Normal'])]
+    
+    # Métodos de construcción de Excel (simplificados)
+    def _build_excel_kpi_sheet(self, workbook, report_data: Dict):
+        pass
+    
+    def _build_excel_insights_sheet(self, workbook, report_data: Dict):
+        pass
+    
+    def _build_excel_channels_sheet(self, workbook, report_data: Dict):
+        pass
+    
+    def _build_excel_attribution_sheet(self, workbook, report_data: Dict):
+        pass
+
+# FastAPI Router para reportes
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
+from ..core.database import get_db
+
+router = APIRouter()
+report_generator = ReportGenerator()
+
+@router.get("/reports/available")
+async def get_available_reports():
+    """Obtiene lista de reportes disponibles"""
+    return report_generator.get_available_reports()
+
+@router.post("/reports/generate")
+async def generate_report(
+    report_type: ReportType,
+    format_type: ReportFormat,
+    period: str = Query("monthly", regex="^(daily|weekly|monthly|quarterly|yearly)$"),
+    custom_filters: Optional[Dict] = None,
+    db: Session = Depends(get_db)
+):
+    """Genera un reporte específico"""
+    return await report_generator.generate_report(report_type, format_type, period, custom_filters, db)
+
+@router.post("/reports/send")
+async def send_report(
+    report_type: ReportType,
+    format_type: ReportFormat,
+    period: str,
+    email_recipients: List[str],
+    custom_filters: Optional[Dict] = None,
+    db: Session = Depends(get_db)
+):
+    """Genera y envía reporte por email"""
+    return await report_generator.generate_and_send_report(
+        report_type, format_type, period, email_recipients, custom_filters, db
+    )
+
+@router.post("/reports/schedule")
+async def schedule_report(
+    report_config: Dict,
+    schedule: str = Query(..., regex="^(daily|weekly|monthly)$"),
+    recipients: List[str] = [],
+    db: Session = Depends(get_db)
+):
+    """Programa un reporte recurrente"""
+    return await report_generator.schedule_recurring_report(report_config, schedule, recipients, db)

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 import asyncio
 
 from ..models.workflow import EmailTemplate, EmailSend, LeadSegment
-from ..models.lead import Lead
+from ..models.integration import Lead
 from ..core.config import settings
 from ..core.database import get_db
 
