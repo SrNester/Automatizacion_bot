@@ -1,0 +1,136 @@
+{
+  "browser": {
+    "type": "chrome",
+    "headless": true,
+    "window_size": "1920,1080",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "download_path": "./downloads",
+    "block_images": false,
+    "ignore_certificate_errors": false,
+    "proxy_settings": {
+      "enabled": false,
+      "proxy_url": "",
+      "proxy_type": "http"
+    }
+  },
+  "actions": {
+    "monitor_prices": {
+      "enabled": true,
+      "interval": 3600,
+      "max_products": 100,
+      "price_threshold": 10,
+      "notify_changes": true,
+      "track_competitors": true,
+      "save_history": true,
+      "advanced": {
+        "price_variation_alert": true,
+        "stock_alert": true,
+        "competitor_analysis": false
+      }
+    },
+    "update_inventory": {
+      "enabled": true,
+      "interval": 1800,
+      "sync_prices": false,
+      "update_descriptions": false,
+      "auto_restock": false,
+      "low_stock_alert": 5,
+      "advanced": {
+        "batch_processing": true,
+        "error_retry": true,
+        "partial_updates": true
+      }
+    },
+    "search_products": {
+      "enabled": true,
+      "max_results": 50,
+      "save_results": true,
+      "categorize_results": true,
+      "auto_categorize": false,
+      "keyword_analysis": true,
+      "advanced": {
+        "trend_analysis": true,
+        "competitor_research": false,
+        "market_gap_analysis": false
+      }
+    },
+    "analyze_competition": {
+      "enabled": true,
+      "interval": 86400,
+      "track_competitors": 5,
+      "generate_reports": true,
+      "price_comparison": true,
+      "review_analysis": true,
+      "advanced": {
+        "sentiment_analysis": false,
+        "market_share_calculation": false,
+        "trend_prediction": false
+      }
+    },
+    "process_orders": {
+      "enabled": false,
+      "interval": 900,
+      "auto_fulfill": false,
+      "email_notifications": true,
+      "tracking_updates": true,
+      "refund_processing": false,
+      "advanced": {
+        "bulk_processing": true,
+        "custom_workflows": false,
+        "api_integration": false
+      }
+    }
+  },
+  "notifications": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "",
+      "port": 587,
+      "sender_email": "",
+      "sender_password": "",
+      "recipients": [],
+      "ssl_required": true,
+      "events": ["error", "completion", "warning"]
+    },
+    "telegram": {
+      "enabled": false,
+      "bot_token": "",
+      "chat_id": "",
+      "notify_errors": true,
+      "notify_success": false,
+      "notify_warnings": true,
+      "events": ["error", "critical"]
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "",
+      "secret": "",
+      "events": ["error", "completion", "session_start", "session_end"],
+      "retry_attempts": 3
+    },
+    "browser": {
+      "enabled": true,
+      "desktop_notifications": true,
+      "sound_alerts": false,
+      "events": ["error", "completion"]
+    }
+  },
+  "performance": {
+    "max_concurrent_sessions": 3,
+    "request_delay": 1000,
+    "timeout_handling": "retry",
+    "memory_optimization": true,
+    "cache_strategy": "aggressive",
+    "resource_monitoring": true,
+    "auto_scale": false
+  },
+  "error_handling": {
+    "max_retries": 3,
+    "retry_delay": 5000,
+    "fallback_strategies": true,
+    "log_errors": true,
+    "screenshot_on_error": true,
+    "notify_on_critical": true,
+    "auto_recovery": false
+  }
+}

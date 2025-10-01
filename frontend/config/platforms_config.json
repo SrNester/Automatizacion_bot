@@ -1,0 +1,84 @@
+{
+  "mercado_libre": {
+    "enabled": true,
+    "timeout": 30,
+    "api_key": "",
+    "api_secret": "",
+    "rate_limit": 10,
+    "auto_login": true,
+    "notifications": true,
+    "price_monitoring": true,
+    "inventory_sync": true,
+    "order_processing": false,
+    "custom_settings": {
+      "search_region": "MLM",
+      "max_results": 50,
+      "include_shipping": true
+    }
+  },
+  "amazon": {
+    "enabled": false,
+    "timeout": 45,
+    "access_key": "",
+    "secret_key": "",
+    "region": "us-east-1",
+    "marketplace": "US",
+    "notifications": true,
+    "price_monitoring": true,
+    "inventory_sync": false,
+    "order_processing": false,
+    "custom_settings": {
+      "seller_central_url": "https://sellercentral.amazon.com",
+      "product_categories": ["Electronics", "Home"],
+      "fulfillment_type": "FBA"
+    }
+  },
+  "shopify": {
+    "enabled": false,
+    "timeout": 30,
+    "store_url": "",
+    "access_token": "",
+    "api_version": "2024-01",
+    "notifications": true,
+    "price_monitoring": false,
+    "inventory_sync": true,
+    "order_processing": true,
+    "custom_settings": {
+      "webhook_enabled": false,
+      "inventory_threshold": 10,
+      "auto_fulfill": false
+    }
+  },
+  "woocommerce": {
+    "enabled": false,
+    "timeout": 30,
+    "store_url": "",
+    "consumer_key": "",
+    "consumer_secret": "",
+    "version": "wc/v3",
+    "notifications": true,
+    "price_monitoring": false,
+    "inventory_sync": true,
+    "order_processing": true,
+    "custom_settings": {
+      "ssl_verify": true,
+      "query_string_auth": false,
+      "wp_api": true
+    }
+  },
+  "aliexpress": {
+    "enabled": false,
+    "timeout": 40,
+    "api_key": "",
+    "tracking_enabled": false,
+    "notifications": false,
+    "price_monitoring": true,
+    "inventory_sync": false,
+    "order_processing": false,
+    "custom_settings": {
+      "ship_from_country": "CN",
+      "max_ship_days": 30,
+      "include_reviews": true
+    }
+  }
+}

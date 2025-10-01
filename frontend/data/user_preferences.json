@@ -1,0 +1,69 @@
+{
+  "user_interface": {
+    "theme": "light",
+    "language": "es",
+    "timezone": "America/Mexico_City",
+    "date_format": "DD/MM/YYYY",
+    "time_format": "24h",
+    "default_view": "dashboard",
+    "sidebar_collapsed": false,
+    "animations_enabled": true
+  },
+  "notifications": {
+    "enabled": true,
+    "browser_alerts": true,
+    "desktop_notifications": false,
+    "sound_alerts": false,
+    "email_summary": false,
+    "alert_types": {
+      "errors": true,
+      "warnings": true,
+      "success": false,
+      "information": false
+    },
+    "quiet_hours": {
+      "enabled": false,
+      "start_time": "22:00",
+      "end_time": "08:00"
+    }
+  },
+  "automation": {
+    "default_platform": "Mercado Libre",
+    "default_timeout": 30,
+    "auto_save_reports": true,
+    "confirm_before_execution": false,
+    "save_session_data": true,
+    "data_retention_days": 30,
+    "backup_settings": true
+  },
+  "export": {
+    "default_format": "csv",
+    "include_timestamps": true,
+    "compress_files": true,
+    "auto_download": false,
+    "custom_columns": [],
+    "export_location": "./exports"
+  },
+  "privacy": {
+    "collect_usage_data": false,
+    "share_anonymous_stats": false,
+    "clear_history_on_exit": false,
+    "remember_credentials": false,
+    "auto_logout": true,
+    "logout_after_minutes": 60
+  },
+  "accessibility": {
+    "high_contrast": false,
+    "larger_text": false,
+    "screen_reader": false,
+    "keyboard_shortcuts": true,
+    "reduced_animations": false
+  },
+  "developer": {
+    "debug_mode": false,
+    "log_level": "INFO",
+    "show_technical_details": false,
+    "enable_experimental": false,
+    "api_debugging": false
+  }
+}

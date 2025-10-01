@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "session_id": "SESSION_0001",
+    "platform": "Mercado Libre",
+    "action": "Monitorear Precios",
+    "status": "completed",
+    "products_processed": 25,
+    "duration": 45.2,
+    "errors": 0,
+    "timestamp": "2024-01-15T09:30:00"
+  },
+  {
+    "id": 2,
+    "session_id": "SESSION_0002",
+    "platform": "Amazon",
+    "action": "Actualizar Inventario",
+    "status": "completed",
+    "products_processed": 18,
+    "duration": 32.1,
+    "errors": 1,
+    "timestamp": "2024-01-15T11:15:00"
+  },
+  {
+    "id": 3,
+    "session_id": "SESSION_0003",
+    "platform": "Shopify",
+    "action": "Buscar Productos",
+    "status": "failed",
+    "products_processed": 0,
+    "duration": 12.5,
+    "errors": 3,
+    "timestamp": "2024-01-15T14:45:00"
+  }
+]

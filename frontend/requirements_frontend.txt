@@ -1,0 +1,39 @@
+# Framework principal
+streamlit==1.28.0
+
+# Procesamiento de datos
+pandas==2.0.3
+numpy==1.24.3
+openpyxl==3.1.2
+
+# Visualización y gráficos
+plotly==5.15.0
+matplotlib==3.7.2
+seaborn==0.12.2
+
+# Automatización web
+selenium==4.15.0
+webdriver-manager==4.0.1
+requests==2.31.0
+beautifulsoup4==4.12.2
+
+# Utilidades y seguridad
+python-dotenv==1.0.0
+pydantic==2.5.0
+python-dateutil==2.8.2
+cryptography==41.0.7
+pillow==10.0.1
+
+# Componentes de Streamlit
+streamlit-aggrid==0.3.4
+streamlit-autorefresh==1.0.1
+streamlit-option-menu==0.3.6
+
+# Sistema y archivos
+watchdog==3.0.0
+pyyaml==6.0.1
+jinja2==3.1.2
+
+# Testing y desarrollo
+pytest==7.4.2
+pytest-mock==3.11.1

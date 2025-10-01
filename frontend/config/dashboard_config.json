@@ -1,0 +1,53 @@
+{
+  "ui": {
+    "theme": "light",
+    "language": "es",
+    "refresh_interval": 30,
+    "default_view": "dashboard",
+    "animations": true,
+    "compact_mode": false,
+    "font_size": "medium",
+    "information_density": "moderate"
+  },
+  "automation": {
+    "default_timeout": 30,
+    "max_retries": 3,
+    "headless_mode": true,
+    "screenshot_on_error": true,
+    "notifications": true,
+    "auto_restart": false,
+    "parallel_execution": false,
+    "delay_between_actions": 1000
+  },
+  "performance": {
+    "max_concurrent_sessions": 5,
+    "session_timeout": 3600,
+    "data_retention_days": 30,
+    "cache_enabled": true,
+    "log_level": "INFO",
+    "auto_cleanup": true
+  },
+  "security": {
+    "encrypt_credentials": true,
+    "session_timeout_minutes": 60,
+    "log_automation_actions": true,
+    "two_factor_auth": false,
+    "max_login_attempts": 5,
+    "password_min_length": 8
+  },
+  "notifications": {
+    "email_alerts": false,
+    "browser_alerts": true,
+    "sound_alerts": false,
+    "desktop_notifications": true,
+    "alert_on_errors": true,
+    "alert_on_completion": false
+  },
+  "export": {
+    "default_format": "csv",
+    "include_timestamps": true,
+    "compress_exports": true,
+    "auto_backup": false,
+    "backup_interval_days": 7
+  }
+}
