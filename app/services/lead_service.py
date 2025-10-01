@@ -1041,3 +1041,28 @@ def get_lead_metrics(db: Session, days: int = 30) -> Dict[str, Any]:
 
 def save_interaction(db: Session, lead_id: int, user_message: str, bot_response: str, **kwargs) -> Dict[str, Any]:
     return LeadService.save_interaction(db, lead_id, user_message, bot_response, **kwargs)
+
+def get_leads_by_date_range(db: Session, start_date: datetime, end_date: datetime):
+    """Obtiene leads por rango de fecha"""
+    # Implementar según tu modelo
+    return []
+
+def get_lead_growth_metrics(db: Session, start_date: datetime, end_date: datetime):
+    """Obtiene métricas de crecimiento de leads"""
+    return {
+        "total_growth": 0,
+        "growth_rate": 0,
+        "weekly_growth": []
+    }
+
+def get_interaction_metrics(db: Session, start_date: datetime, end_date: datetime):
+    """Obtiene métricas de interacciones"""
+    return {
+        "total_interactions": 0,
+        "avg_interactions_per_lead": 0,
+        "most_common_interaction_type": "message"
+    }
+
+def get_leads_by_status(db: Session):
+    """Obtiene leads agrupados por status"""
+    return []
