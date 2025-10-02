@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from typing import Dict, Any, List
 import logging
 
-from app.models.integration import Lead
-from app.services.integrations import hubspot_service
+from .models.integration import Lead
+from .services.integrations import hubspot_service
 from .core.database import get_db
 from .services.lead_scoring import LeadScoringService
 from .services.ai_assistant import AIAssistant, get_conversation_history
