@@ -130,5 +130,24 @@
     "id": 8,
     "session_id": "SESSION_0008",
     "created_at": "2025-10-02 19:49:42"
+  },
+  {
+    "platform": "Sales Automation",
+    "action": "Chat con Lead",
+    "status": "completed",
+    "products_processed": 1,
+    "duration": 3.2,
+    "errors": 0,
+    "config": {
+      "platform": "Sales Automation",
+      "action": "Chat con Lead",
+      "lead_id": 1,
+      "message": "jhgf\n"
+    },
+    "is_real_data": true,
+    "timestamp": "2025-10-02T20:35:48.142815",
+    "id": 9,
+    "session_id": "SESSION_0009",
+    "created_at": "2025-10-02 20:35:48"
   }
 ]

@@ -423,3 +423,10 @@
 2025-10-02 19:54:14,824 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:54:14.824952', 'error': None, 'mode': 'real'}
 2025-10-02 19:54:16,907 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:54:16.907710', 'error': None, 'mode': 'real'}
 2025-10-02 19:56:09,129 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:56:09.129659', 'error': None, 'mode': 'real'}
+2025-10-02 20:34:53,425 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T20:34:53.425394', 'error': None, 'mode': 'real'}
+2025-10-02 20:35:01,970 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T20:35:01.970271', 'error': None, 'mode': 'real'}
+2025-10-02 20:35:04,039 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T20:35:04.039477', 'error': None, 'mode': 'real'}
+2025-10-02 20:35:45,778 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T20:35:45.778827', 'error': None, 'mode': 'real'}
+2025-10-02 20:35:46,024 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T20:35:46.024642', 'error': None, 'mode': 'real'}
+2025-10-02 20:35:48,136 - AutomationBot - INFO - Ejecutando: Chat con Lead en Sales Automation
+2025-10-02 20:36:00,458 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T20:36:00.458937', 'error': None, 'mode': 'real'}
