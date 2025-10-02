@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, validator
+from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from typing import List, Optional, Dict, Any
 from datetime import timedelta
 import secrets
@@ -154,19 +155,27 @@ class Settings(BaseSettings):
     # VALIDACIONES Y CONFIGURACIONES DERIVADAS
     # =========================================================================
     
-    @validator("ALLOWED_HOSTS", pre=True)
+class Settings(BaseSettings):
+    ALLOWED_HOSTS: list[str]
+    CORS_ORIGINS: list[str]
+    ALERT_EMAIL_RECIPIENTS: list[str]
+
+    @field_validator("ALLOWED_HOSTS", mode="before")
+    @classmethod
     def parse_allowed_hosts(cls, v):
         if isinstance(v, str):
             return [host.strip() for host in v.split(",")]
         return v
-    
-    @validator("CORS_ORIGINS", pre=True)
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
     def parse_cors_origins(cls, v):
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]
         return v
-    
-    @validator("ALERT_EMAIL_RECIPIENTS", pre=True)
+
+    @field_validator("ALERT_EMAIL_RECIPIENTS", mode="before")
+    @classmethod
     def parse_alert_recipients(cls, v):
         if isinstance(v, str):
             return [email.strip() for email in v.split(",")]

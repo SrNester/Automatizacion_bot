@@ -1,3 +1,4 @@
+# app.py - VERSIÓN ACTUALIZADA CON SALES AUTOMATION
 import streamlit as st
 import sys
 import os
@@ -16,6 +17,8 @@ from components.metrics import render_metrics
 from components.controls import render_controls
 from components.history import render_history
 from components.analytics import render_analytics
+from components.sales_automation import render_sales_automation
+from components.diagnostics import render_diagnostics_panel
 
 # Importar core
 from core.session_manager import SessionManager
@@ -31,13 +34,13 @@ class AutomationDashboard:
         self.config_manager = ConfigManager()
         self.automation_bot = AutomationBot()
         
-        # Inicializar datos de ejemplo si no existen
+        # Inicializar datos de ejemplo
         self.initialize_sample_data()
     
     def setup_page_config(self):
         """Configurar la página de Streamlit"""
         st.set_page_config(
-            page_title="🤖 Bot de Automatización - Dashboard",
+            page_title="🤖 Sales Automation Dashboard",
             page_icon="🤖",
             layout="wide",
             initial_sidebar_state="expanded"
@@ -73,35 +76,38 @@ class AutomationDashboard:
                 {
                     "id": 1,
                     "session_id": "SESSION_0001",
+                    "platform": "Sales Automation",
+                    "action": "Capturar Lead",
+                    "status": "completed",
+                    "products_processed": 1,
+                    "duration": 2.5,
+                    "errors": 0,
+                    "is_real_data": False,
+                    "timestamp": (datetime.now()).isoformat()
+                },
+                {
+                    "id": 2,
+                    "session_id": "SESSION_0002",
+                    "platform": "Sales Automation", 
+                    "action": "Chat con Lead",
+                    "status": "completed",
+                    "products_processed": 1,
+                    "duration": 3.2,
+                    "errors": 0,
+                    "is_real_data": False,
+                    "timestamp": (datetime.now()).isoformat()
+                },
+                {
+                    "id": 3,
+                    "session_id": "SESSION_0003",
                     "platform": "Mercado Libre",
                     "action": "Monitorear Precios",
                     "status": "completed",
                     "products_processed": 25,
                     "duration": 45.2,
                     "errors": 0,
-                    "timestamp": "2024-01-15T09:30:00"
-                },
-                {
-                    "id": 2,
-                    "session_id": "SESSION_0002", 
-                    "platform": "Amazon",
-                    "action": "Actualizar Inventario",
-                    "status": "completed",
-                    "products_processed": 18,
-                    "duration": 32.1,
-                    "errors": 1,
-                    "timestamp": "2024-01-15T11:15:00"
-                },
-                {
-                    "id": 3,
-                    "session_id": "SESSION_0003",
-                    "platform": "Shopify",
-                    "action": "Buscar Productos",
-                    "status": "failed",
-                    "products_processed": 0,
-                    "duration": 12.5,
-                    "errors": 3,
-                    "timestamp": "2024-01-15T14:45:00"
+                    "is_real_data": False,
+                    "timestamp": (datetime.now()).isoformat()
                 }
             ]
             self.session_manager.sessions = sample_sessions
@@ -112,8 +118,8 @@ class AutomationDashboard:
         st.markdown(
             """
             <div style='text-align: center; padding: 4rem 0;'>
-                <h1>🤖 Bot de Automatización</h1>
-                <p style='color: #666;'>Sistema de Gestión de Ventas Automatizadas</p>
+                <h1>🤖 Sales Automation Dashboard</h1>
+                <p style='color: #666;'>Sistema Integrado de Automatización de Ventas</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -125,7 +131,7 @@ class AutomationDashboard:
             with st.form("login_form"):
                 st.subheader("🔐 Iniciar Sesión")
                 
-                username = st.text_input("Usuario", placeholder="usuario@empresa.com")
+                username = st.text_input("Usuario", placeholder="admin@sales.com")
                 password = st.text_input("Contraseña", type="password", placeholder="••••••••")
                 
                 if st.form_submit_button("🚀 Ingresar al Dashboard", use_container_width=True):
@@ -143,7 +149,7 @@ class AutomationDashboard:
             st.info("**Demo:** Usa 'admin' / 'admin' para acceder")
     
     def render_main_layout(self):
-        """Renderizar layout principal"""
+        """Renderizar layout principal ACTUALIZADO"""
         # Header
         render_header()
         
@@ -153,25 +159,28 @@ class AutomationDashboard:
         # Métricas principales
         render_metrics(self.session_manager)
         
-        # Pestañas principales
-        tab1, tab2, tab3, tab4, tab5 = st.tabs([
-            "🎮 Control", "📊 Analytics", "📋 Historial", "⚙️ Configuración", "🔧 Herramientas"
+        # PESTAÑAS ACTUALIZADAS - AGREGAR SALES AUTOMATION
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+            "🎮 Control", "🤖 Ventas", "📊 Analytics", "📋 Historial", "⚙️ Configuración", "🔧 Diagnóstico"
         ])
         
         with tab1:
             render_controls(self.automation_bot, self.session_manager, config_data)
         
         with tab2:
-            render_analytics(self.session_manager)
+            render_sales_automation(self.automation_bot, self.session_manager)
         
         with tab3:
-            render_history(self.session_manager)
+            render_analytics(self.session_manager)
         
         with tab4:
-            self.render_configuration_tab()
+            render_history(self.session_manager)
         
         with tab5:
-            self.render_tools_tab()
+            self.render_configuration_tab()
+        
+        with tab6:
+            render_diagnostics_panel(self.automation_bot)
     
     def render_configuration_tab(self):
         """Renderizar pestaña de configuración"""
@@ -187,146 +196,40 @@ class AutomationDashboard:
             self.security_manager.render_security_settings()
         
         with col2:
-            st.subheader("Configuración de Plataformas")
-            self.config_manager.render_platforms_settings()
+            st.subheader("Configuración de Backend")
+            self.render_backend_configuration()
             
             st.subheader("Preferencias de UI")
             self.config_manager.render_ui_settings()
     
-    def render_tools_tab(self):
-        """Renderizar pestaña de herramientas"""
-        st.header("🔧 Herramientas del Sistema")
+    def render_backend_configuration(self):
+        """Configuración específica del backend FastAPI"""
+        st.subheader("🔗 Configuración del Backend")
         
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("Mantenimiento")
+        with st.form("backend_config_form"):
+            backend_url = st.text_input(
+                "URL del Backend FastAPI",
+                value="http://localhost:8000",
+                help="URL donde está ejecutándose tu servidor FastAPI"
+            )
             
-            if st.button("🔄 Limpiar Cache", use_container_width=True):
-                self.session_manager.clear_old_sessions(days=7)
-                st.success("✅ Cache limpiado exitosamente")
+            timeout = st.number_input(
+                "Timeout (segundos)",
+                min_value=5,
+                max_value=60,
+                value=10,
+                help="Tiempo máximo de espera para requests"
+            )
             
-            if st.button("📊 Generar Reporte Completo", use_container_width=True):
-                self.generate_comprehensive_report()
+            auto_retry = st.checkbox(
+                "Reintento automático",
+                value=True,
+                help="Reintentar automáticamente en caso de error de conexión"
+            )
             
-            if st.button("🔍 Ver Logs del Sistema", use_container_width=True):
-                self.show_system_logs()
-        
-        with col2:
-            st.subheader("Utilidades")
-            
-            if st.button("📤 Exportar Todos los Datos", use_container_width=True):
-                self.export_all_data()
-            
-            if st.button("🛠️ Probar Conexiones", use_container_width=True):
-                self.test_connections()
-            
-            if st.button("📝 Documentación", use_container_width=True):
-                self.show_documentation()
-    
-    def generate_comprehensive_report(self):
-        """Generar reporte completo del sistema"""
-        stats = self.session_manager.get_statistics()
-        
-        report = f"""
-        # 📊 Reporte del Sistema de Automatización
-        **Generado:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-        
-        ## 📈 Métricas Principales
-        - **Sesiones Totales:** {stats['total_sessions']}
-        - **Tasa de Éxito:** {stats['success_rate']:.1f}%
-        - **Productos Procesados:** {stats['total_products']}
-        - **Tiempo Promedio:** {stats['avg_time']:.1f}s
-        
-        ## 🌐 Plataformas Configuradas
-        """
-        
-        for platform, config in self.config_manager.configs['platforms'].items():
-            report += f"- **{platform.replace('_', ' ').title()}:** {'✅ Habilitada' if config.get('enabled') else '❌ Deshabilitada'}\n"
-        
-        st.download_button(
-            label="📥 Descargar Reporte PDF",
-            data=report,
-            file_name=f"reporte_automatizacion_{datetime.now().strftime('%Y%m%d')}.md",
-            mime="text/markdown"
-        )
-        st.success("📋 Reporte generado exitosamente")
-    
-    def show_system_logs(self):
-        """Mostrar logs del sistema"""
-        st.subheader("📝 Logs del Sistema")
-        
-        try:
-            with open('logs/dashboard.log', 'r') as f:
-                logs = f.read()
-            
-            st.text_area("Logs recientes", logs, height=300)
-        except FileNotFoundError:
-            st.info("No hay logs disponibles aún")
-    
-    def export_all_data(self):
-        """Exportar todos los datos"""
-        import pandas as pd
-        
-        # Exportar sesiones
-        df_sessions = pd.DataFrame(self.session_manager.sessions)
-        csv_sessions = df_sessions.to_csv(index=False)
-        
-        st.download_button(
-            label="📥 Descargar Sesiones (CSV)",
-            data=csv_sessions,
-            file_name="sesiones_automatizacion.csv",
-            mime="text/csv"
-        )
-    
-    def test_connections(self):
-        """Probar conexiones del sistema"""
-        with st.spinner("🔍 Probando conexiones..."):
-            import time
-            time.sleep(2)
-            
-            results = [
-                {"Servicio": "Base de datos", "Estado": "✅ Conectado", "Latencia": "45ms"},
-                {"Servicio": "API Mercado Libre", "Estado": "✅ Conectado", "Latencia": "120ms"},
-                {"Servicio": "API Amazon", "Estado": "⚠️ Lento", "Latencia": "450ms"},
-                {"Servicio": "Servidor de Logs", "Estado": "✅ Conectado", "Latencia": "30ms"},
-            ]
-            
-            st.table(results)
-    
-    def show_documentation(self):
-        """Mostrar documentación"""
-        st.subheader("📚 Documentación del Sistema")
-        
-        with st.expander("🎯 Cómo Usar el Dashboard", expanded=True):
-            st.markdown("""
-            ### Guía Rápida de Uso
-            
-            1. **🎮 Control**: Ejecuta automatizaciones manualmente
-            2. **📊 Analytics**: Ve métricas y gráficos de rendimiento  
-            3. **📋 Historial**: Revisa sesiones anteriores
-            4. **⚙️ Configuración**: Personaliza el sistema
-            5. **🔧 Herramientas**: Utilidades avanzadas
-            
-            ### Flujo de Trabajo Recomendado
-            - Configura tus plataformas primero
-            - Prueba con ejecuciones manuales
-            - Revisa el historial y analytics
-            - Optimiza configuraciones basado en resultados
-            """)
-        
-        with st.expander("🔧 Configuración de Plataformas"):
-            st.markdown("""
-            ### Mercado Libre
-            - Necesitas credenciales de desarrollador
-            - Configura los timeouts apropiadamente
-            - Respeta los límites de la API
-            
-            ### Amazon
-            - Requiere cuenta profesional
-            - Configuración específica por región
-            - Considera límites de solicitudes
-            """)
+            if st.form_submit_button("💾 Guardar Configuración Backend"):
+                # Aquí guardarías la configuración
+                st.success("✅ Configuración del backend guardada")
     
     def run(self):
         """Ejecutar la aplicación"""

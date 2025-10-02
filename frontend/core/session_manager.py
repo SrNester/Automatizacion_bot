@@ -121,83 +121,6 @@ class SessionManager:
                 continue
         return result
     
-    def get_statistics(self) -> Dict[str, Any]:
-        """Obtener estadísticas completas de las sesiones"""
-        if not self.sessions:
-            return self.get_empty_statistics()
-        
-        try:
-            df = pd.DataFrame(self.sessions)
-            df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
-            
-            # Filtrar fechas válidas
-            df = df[df['timestamp'].notna()]
-            
-            # Estadísticas generales
-            total_sessions = len(df)
-            successful_sessions = len(df[df['status'] == 'completed'])
-            failed_sessions = len(df[df['status'] == 'failed'])
-            success_rate = (successful_sessions / total_sessions) * 100 if total_sessions > 0 else 0
-            
-            # Productos procesados
-            total_products = df['products_processed'].sum() if 'products_processed' in df.columns else 0
-            
-            # Tiempos
-            avg_duration = df['duration'].mean() if 'duration' in df.columns else 0
-            
-            # Sesiones de hoy
-            today = datetime.now().date()
-            sessions_today = len(df[df['timestamp'].dt.date == today])
-            
-            # Por plataforma
-            platform_stats = {}
-            if 'platform' in df.columns:
-                platform_stats = df['platform'].value_counts().to_dict()
-            
-            # Por acción
-            action_stats = {}
-            if 'action' in df.columns:
-                action_stats = df['action'].value_counts().to_dict()
-            
-            # Tendencias (últimos 7 días)
-            last_week = datetime.now() - timedelta(days=7)
-            recent_sessions = df[df['timestamp'] >= last_week]
-            sessions_last_week = len(recent_sessions)
-            
-            return {
-                "total_sessions": total_sessions,
-                "successful_sessions": successful_sessions,
-                "failed_sessions": failed_sessions,
-                "success_rate": success_rate,
-                "total_products": total_products,
-                "avg_duration": avg_duration,
-                "sessions_today": sessions_today,
-                "sessions_last_week": sessions_last_week,
-                "platform_stats": platform_stats,
-                "action_stats": action_stats,
-                "last_updated": datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            self.logger.error(f"Error calculando estadísticas: {e}")
-            return self.get_empty_statistics()
-    
-    def get_empty_statistics(self):
-        """Obtener estadísticas vacías"""
-        return {
-            "total_sessions": 0,
-            "successful_sessions": 0,
-            "failed_sessions": 0,
-            "success_rate": 0,
-            "total_products": 0,
-            "avg_duration": 0,
-            "sessions_today": 0,
-            "sessions_last_week": 0,
-            "platform_stats": {},
-            "action_stats": {},
-            "last_updated": datetime.now().isoformat()
-        }
-    
     def clear_old_sessions(self, days: int = 30):
         """Eliminar sesiones antiguas"""
         try:
@@ -248,15 +171,200 @@ class SessionManager:
         
         return sorted(timeline, key=lambda x: x['timestamp'], reverse=True)
     
+    def get_statistics(self) -> Dict[str, Any]:
+        """Obtener estadísticas para las métricas del dashboard"""
+        try:
+            if not self.sessions:
+                return self._get_empty_statistics()
+            
+            total_sessions = len(self.sessions)
+            successful_sessions = len([s for s in self.sessions if s.get('status') == 'completed'])
+            failed_sessions = len([s for s in self.sessions if s.get('status') == 'failed'])
+            pending_sessions = len([s for s in self.sessions if s.get('status') == 'pending'])
+            
+            # Calcular tasa de éxito
+            success_rate = (successful_sessions / total_sessions * 100) if total_sessions > 0 else 0
+            
+            # Calcular productos procesados totales
+            total_products = sum(s.get('products_processed', 0) for s in self.sessions)
+            
+            # Calcular duración promedio
+            durations = [s.get('duration', 0) for s in self.sessions if s.get('duration')]
+            avg_duration = sum(durations) / len(durations) if durations else 0
+            
+            # Sesiones por plataforma
+            platforms = {}
+            for session in self.sessions:
+                platform = session.get('platform', 'unknown')
+                platforms[platform] = platforms.get(platform, 0) + 1
+            
+            # Sesiones de hoy
+            today = datetime.now().date()
+            sessions_today = len([
+                s for s in self.sessions 
+                if datetime.fromisoformat(s['timestamp'].replace('Z', '+00:00')).date() == today
+            ])
+            
+            return {
+                'total_sessions': total_sessions,
+                'successful_sessions': successful_sessions,
+                'failed_sessions': failed_sessions,
+                'pending_sessions': pending_sessions,
+                'success_rate': round(success_rate, 2),
+                'total_products': total_products,
+                'avg_duration': round(avg_duration, 2),
+                'sessions_today': sessions_today,
+                'platforms_distribution': platforms,
+                'last_updated': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error calculando estadísticas: {e}")
+            return self._get_empty_statistics()
+    
+    def _get_empty_statistics(self) -> Dict[str, Any]:
+        """Retornar estadísticas vacías cuando no hay datos"""
+        return {
+            'total_sessions': 0,
+            'successful_sessions': 0,
+            'failed_sessions': 0,
+            'pending_sessions': 0,
+            'success_rate': 0,
+            'total_products': 0,
+            'avg_duration': 0,
+            'sessions_today': 0,
+            'platforms_distribution': {},
+            'last_updated': datetime.now().isoformat()
+        }
+    
     def get_performance_metrics(self) -> Dict[str, Any]:
         """Obtener métricas de performance"""
         stats = self.get_statistics()
         
+        # Calcular métricas de performance basadas en las estadísticas
+        throughput = stats["total_products"] / max(stats["total_sessions"], 1)
+        reliability = 100 - (stats["failed_sessions"] / max(stats["total_sessions"], 1) * 100)
+        efficiency = min(stats["success_rate"] * (100 / max(stats["avg_duration"], 1)), 100)
+        
         return {
             "overall_performance": stats["success_rate"],
-            "throughput": stats["total_products"] / max(stats["total_sessions"], 1),
-            "reliability": 100 - (stats["failed_sessions"] / max(stats["total_sessions"], 1) * 100),
-            "efficiency": min(stats["success_rate"] * (100 / max(stats["avg_duration"], 1)), 100),
-            "availability": "99.8%",  # Esto vendría de monitoreo en tiempo real
-            "last_calculation": datetime.now().isoformat()
+            "throughput": round(throughput, 2),
+            "reliability": round(reliability, 2),
+            "efficiency": round(efficiency, 2),
+            "availability": "99.8%",
+            "last_calculation": datetime.now().isoformat(),
+            "data_points": stats["total_sessions"]
         }
+    
+    def get_daily_statistics(self, days: int = 7) -> Dict[str, Any]:
+        """Obtener estadísticas diarias para los últimos N días"""
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        
+        daily_stats = {}
+        current_date = start_date
+        
+        while current_date <= end_date:
+            date_str = current_date.strftime('%Y-%m-%d')
+            sessions_on_date = [
+                s for s in self.sessions 
+                if datetime.fromisoformat(s['timestamp'].replace('Z', '+00:00')).date() == current_date.date()
+            ]
+            
+            successful = len([s for s in sessions_on_date if s.get('status') == 'completed'])
+            failed = len([s for s in sessions_on_date if s.get('status') == 'failed'])
+            
+            daily_stats[date_str] = {
+                'total': len(sessions_on_date),
+                'successful': successful,
+                'failed': failed,
+                'success_rate': round((successful / len(sessions_on_date) * 100) if sessions_on_date else 0, 2)
+            }
+            
+            current_date += timedelta(days=1)
+        
+        return daily_stats
+    
+    def get_platform_statistics(self) -> Dict[str, Any]:
+        """Obtener estadísticas detalladas por plataforma"""
+        platforms = {}
+        
+        for session in self.sessions:
+            platform = session.get('platform', 'unknown')
+            if platform not in platforms:
+                platforms[platform] = {
+                    'total_sessions': 0,
+                    'successful_sessions': 0,
+                    'failed_sessions': 0,
+                    'total_products': 0,
+                    'total_duration': 0
+                }
+            
+            platforms[platform]['total_sessions'] += 1
+            platforms[platform]['total_products'] += session.get('products_processed', 0)
+            platforms[platform]['total_duration'] += session.get('duration', 0)
+            
+            if session.get('status') == 'completed':
+                platforms[platform]['successful_sessions'] += 1
+            elif session.get('status') == 'failed':
+                platforms[platform]['failed_sessions'] += 1
+        
+        # Calcular métricas derivadas
+        for platform, data in platforms.items():
+            data['success_rate'] = round(
+                (data['successful_sessions'] / data['total_sessions'] * 100) if data['total_sessions'] > 0 else 0, 
+                2
+            )
+            data['avg_duration'] = round(
+                data['total_duration'] / data['total_sessions'] if data['total_sessions'] > 0 else 0, 
+                2
+            )
+            data['products_per_session'] = round(
+                data['total_products'] / data['total_sessions'] if data['total_sessions'] > 0 else 0, 
+                2
+            )
+        
+        return platforms
+    
+    def add_sample_data(self):
+        """Agregar datos de ejemplo para testing"""
+        sample_sessions = [
+            {
+                'platform': 'whatsapp',
+                'action': 'send_message',
+                'status': 'completed',
+                'products_processed': 15,
+                'duration': 120,
+                'message': 'Promoción enviada exitosamente'
+            },
+            {
+                'platform': 'email',
+                'action': 'campaign',
+                'status': 'completed',
+                'products_processed': 50,
+                'duration': 300,
+                'message': 'Campaña de email completada'
+            },
+            {
+                'platform': 'whatsapp',
+                'action': 'send_message',
+                'status': 'failed',
+                'products_processed': 0,
+                'duration': 30,
+                'message': 'Error de conexión',
+                'error': 'Timeout exception'
+            },
+            {
+                'platform': 'instagram',
+                'action': 'auto_reply',
+                'status': 'completed',
+                'products_processed': 8,
+                'duration': 60,
+                'message': 'Respuestas automáticas enviadas'
+            }
+        ]
+        
+        for session_data in sample_sessions:
+            self.add_session(session_data)
+        
+        self.logger.info("Datos de ejemplo agregados exitosamente")

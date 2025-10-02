@@ -189,62 +189,159 @@ def render_quick_actions_panel(automation_bot):
             execute_quick_action(automation_bot, action["action"])
 
 def render_bot_status_panel(automation_bot):
-    """Renderizar panel de estado del bot"""
+    """Renderizar panel de estado del bot - VERSIÓN CORREGIDA"""
     st.subheader("🤖 Estado del Bot")
     
-    # Estado actual
-    status = automation_bot.get_status()
-    
-    # Indicador de estado
-    status_color = {
-        "running": "🟢",
-        "paused": "🟡", 
-        "stopped": "🔴",
-        "error": "🔴"
-    }
-    
-    st.markdown(
-        f"""
-        <div style='
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid {"#28a745" if status["state"] == "running" else "#ffc107" if status["state"] == "paused" else "#dc3545"};
-            margin-bottom: 1rem;
-        '>
-            <div style='font-size: 1.2rem; font-weight: bold;'>
-                {status_color[status["state"]]} Estado: {status["state"].upper()}
+    try:
+        # Obtener estado del bot
+        status = automation_bot.get_status()
+        
+        # Usar las claves correctas del método get_status()
+        active_sessions_count = status.get("active_sessions_count", 0)
+        scheduled_tasks_count = status.get("scheduled_tasks_count", 0)
+        state = status.get("state", "stopped")
+        status_message = status.get("status_message", "Estado no disponible")
+        last_activity = status.get("last_activity")
+        start_time = status.get("start_time")
+        
+        # Formatear fechas
+        last_activity_str = "Nunca"
+        if last_activity:
+            try:
+                last_activity_dt = datetime.fromisoformat(last_activity.replace('Z', '+00:00'))
+                last_activity_str = last_activity_dt.strftime('%H:%M:%S')
+            except:
+                last_activity_str = "Reciente"
+        
+        start_time_str = "No iniciado"
+        if start_time:
+            try:
+                start_time_dt = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+                start_time_str = start_time_dt.strftime('%H:%M:%S')
+            except:
+                start_time_str = "Activo"
+        
+        # Indicador de estado
+        status_color = {
+            "running": "🟢",
+            "paused": "🟡", 
+            "stopped": "🔴",
+            "error": "🔴"
+        }.get(state, "⚪")
+        
+        st.markdown(
+            f"""
+            <div style='
+                background: #f8f9fa;
+                padding: 1rem;
+                border-radius: 8px;
+                border-left: 4px solid {"#28a745" if state == "running" else "#ffc107" if state == "paused" else "#dc3545"};
+                margin-bottom: 1rem;
+            '>
+                <div style='font-size: 1.2rem; font-weight: bold;'>
+                    {status_color} Estado: {state.upper()}
+                </div>
+                <div style='font-size: 0.9rem; color: #666;'>
+                    📊 Sesiones activas: {active_sessions_count}<br>
+                    ⏰ Última actividad: {last_activity_str}<br>
+                    🚀 Iniciado: {start_time_str}<br>
+                    📝 Mensaje: {status_message}
+                </div>
             </div>
-            <div style='font-size: 0.9rem; color: #666;'>
-                📊 Sesiones activas: {status["active_sessions"]}<br>
-                ⏰ Última ejecución: {status["last_execution"]}<br>
-                🚦 Próxima ejecución: {status["next_execution"]}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    
-    # Controles de estado
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if status["state"] == "running":
-            if st.button("⏸️ Pausar", use_container_width=True):
-                automation_bot.pause()
-                st.success("Bot pausado")
-                st.rerun()
-        else:
-            if st.button("▶️ Reanudar", use_container_width=True):
-                automation_bot.resume()
-                st.success("Bot reanudado")
-                st.rerun()
-    
-    with col2:
-        if st.button("🔄 Reiniciar", use_container_width=True, type="secondary"):
-            automation_bot.restart()
-            st.success("Bot reiniciado")
-            st.rerun()
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # Mostrar información adicional si está disponible
+        if status.get('current_platform') or status.get('current_action'):
+            with st.expander("📋 Información Detallada"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    if status.get('current_platform'):
+                        st.write(f"**Plataforma actual:** {status['current_platform']}")
+                    if status.get('current_action'):
+                        st.write(f"**Acción actual:** {status['current_action']}")
+                    if status.get('progress', 0) > 0:
+                        st.write(f"**Progreso:** {status['progress']:.1f}%")
+                
+                with col2:
+                    if status.get('completed_tasks', 0) > 0:
+                        st.write(f"**Tareas completadas:** {status['completed_tasks']}")
+                    if status.get('failed_tasks', 0) > 0:
+                        st.write(f"**Tareas fallidas:** {status['failed_tasks']}")
+                    if status.get('uptime', 0) > 0:
+                        uptime_minutes = status['uptime'] / 60
+                        st.write(f"**Tiempo activo:** {uptime_minutes:.1f} min")
+        
+        # Controles de estado
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if state != "running":
+                if st.button("▶️ Iniciar", use_container_width=True, type="primary"):
+                    try:
+                        automation_bot.start_automation({"platform": "Dashboard", "action": "Inicio manual"})
+                        st.success("Bot iniciado")
+                        time.sleep(1)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error iniciando bot: {e}")
+            else:
+                if st.button("⏸️ Pausar", use_container_width=True):
+                    try:
+                        automation_bot.pause_automation()
+                        st.success("Bot pausado")
+                        time.sleep(1)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error pausando bot: {e}")
+        
+        with col2:
+            if state == "paused":
+                if st.button("▶️ Reanudar", use_container_width=True):
+                    try:
+                        automation_bot.resume_automation()
+                        st.success("Bot reanudado")
+                        time.sleep(1)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error reanudando bot: {e}")
+            else:
+                if st.button("🔁 Reiniciar", use_container_width=True, type="secondary"):
+                    try:
+                        automation_bot.stop_automation()
+                        time.sleep(0.5)
+                        automation_bot.start_automation({"platform": "Dashboard", "action": "Reinicio manual"})
+                        st.success("Bot reiniciado")
+                        time.sleep(1)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error reiniciando bot: {e}")
+        
+        with col3:
+            if state in ["running", "paused"]:
+                if st.button("⏹️ Detener", use_container_width=True, type="secondary"):
+                    try:
+                        automation_bot.stop_automation()
+                        st.success("Bot detenido")
+                        time.sleep(1)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error deteniendo bot: {e}")
+        
+        # Mostrar información de conexión API
+        api_status = status.get("api_connection_status", {})
+        if api_status:
+            with st.expander("🔗 Estado de Conexión API"):
+                is_connected = api_status.get("is_connected", False)
+                connection_status = "🟢 Conectado" if is_connected else "🔴 Desconectado"
+                st.write(f"**Estado:** {connection_status}")
+                st.write(f"**Backend:** {api_status.get('backend_type', 'N/A')}")
+                st.write(f"**URL:** {api_status.get('base_url', 'N/A')}")
+                
+    except Exception as e:
+        st.error(f"❌ Error obteniendo estado del bot: {str(e)}")
+        st.info("El bot puede estar inicializándose o tener problemas de conexión...")
 
 def render_advanced_settings():
     """Renderizar configuraciones avanzadas"""
@@ -290,35 +387,36 @@ def execute_automation(automation_bot, session_manager, config):
     try:
         with st.spinner(f"🚀 Ejecutando {config['action']} en {config['platform']}..."):
             
-            # Simular ejecución (en una app real aquí se llamaría al bot real)
-            time.sleep(2)
+            # Iniciar el bot si no está corriendo
+            if not automation_bot.state == "running":
+                automation_bot.start_automation(config)
             
-            # Resultado simulado
-            result = {
-                "success": True,
-                "products_processed": 25,
-                "duration": 45.2,
-                "errors": 0,
-                "message": "Automatización completada exitosamente"
-            }
+            # Ejecutar la automatización
+            result = automation_bot.execute_automation(config)
             
-            if result["success"]:
+            if result.get("success", False):
                 # Guardar sesión
                 session_data = {
                     "platform": config["platform"],
                     "action": config["action"],
                     "status": "completed",
-                    "products_processed": result["products_processed"],
-                    "duration": result["duration"],
-                    "errors": result["errors"],
-                    "config": config
+                    "products_processed": result.get("products_processed", 0),
+                    "duration": result.get("duration", 0),
+                    "errors": result.get("errors", 0),
+                    "config": config,
+                    "message": result.get("message", "Ejecución completada"),
+                    "is_real_data": result.get("is_real_data", False)
                 }
                 session_manager.add_session(session_data)
                 
-                st.success(f"✅ {result['message']}")
+                st.success(f"✅ {result.get('message', 'Automatización completada exitosamente')}")
+                if result.get("is_real_data"):
+                    st.info("📡 **Datos en tiempo real** desde el backend")
+                else:
+                    st.warning("🔄 **Datos simulados** - Backend no disponible")
                 st.balloons()
             else:
-                st.error(f"❌ Error en la automatización: {result['message']}")
+                st.error(f"❌ Error en la automatización: {result.get('message', 'Error desconocido')}")
                 
     except Exception as e:
         st.error(f"💥 Error crítico: {str(e)}")
@@ -326,18 +424,46 @@ def execute_automation(automation_bot, session_manager, config):
 def execute_quick_action(automation_bot, action):
     """Ejecutar acción rápida"""
     action_configs = {
-        "quick_monitor": {"action": "Monitorear Precios", "limit": 50},
-        "quick_analysis": {"action": "Analizar Competencia", "period": 1},
-        "quick_inventory": {"action": "Actualizar Inventario", "sync": True},
-        "quick_search": {"action": "Buscar Productos", "limit": 20}
+        "quick_monitor": {
+            "platform": "Mercado Libre", 
+            "action": "Monitorear Precios", 
+            "limit": 50
+        },
+        "quick_analysis": {
+            "platform": "Amazon", 
+            "action": "Analizar Competencia", 
+            "period": 1
+        },
+        "quick_inventory": {
+            "platform": "Shopify", 
+            "action": "Actualizar Inventario", 
+            "sync": True
+        },
+        "quick_search": {
+            "platform": "Aliexpress", 
+            "action": "Buscar Productos", 
+            "limit": 20
+        }
     }
     
     config = action_configs.get(action, {})
-    st.info(f"🚀 Ejecutando {config.get('action', 'acción rápida')}...")
     
-    # Simular ejecución rápida
-    time.sleep(1)
-    st.success(f"✅ {config.get('action', 'Acción rápida')} completada")
+    try:
+        with st.spinner(f"🚀 Ejecutando {config.get('action', 'acción rápida')}..."):
+            # Iniciar bot si es necesario
+            if not automation_bot.state == "running":
+                automation_bot.start_automation(config)
+            
+            # Ejecutar acción
+            result = automation_bot.execute_automation(config)
+            
+            if result.get("success", False):
+                st.success(f"✅ {config.get('action', 'Acción rápida')} completada")
+            else:
+                st.error(f"❌ Error en acción rápida: {result.get('message', 'Error desconocido')}")
+                
+    except Exception as e:
+        st.error(f"💥 Error en acción rápida: {str(e)}")
 
 def save_automation_config(config):
     """Guardar configuración de automatización"""
