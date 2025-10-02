@@ -15,3 +15,411 @@
 2025-10-02 18:43:59,757 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T18:43:59.757550', 'error': None, 'mode': 'real'}
 2025-10-02 18:44:07,707 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T18:44:07.707166', 'error': None, 'mode': 'real'}
 2025-10-02 18:44:09,787 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T18:44:09.787584', 'error': None, 'mode': 'real'}
+2025-10-02 19:12:42,429 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:12:42.429073', 'error': None, 'mode': 'real'}
+2025-10-02 19:13:35,584 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:13:35.584340', 'error': None, 'mode': 'real'}
+2025-10-02 19:13:49,782 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:13:49.782160', 'error': None, 'mode': 'real'}
+2025-10-02 19:13:51,898 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:13:51.898876', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:32,677 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:32.677750', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:32,719 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:35,812 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:35.812977', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:35,852 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:38,930 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:38.930093', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:38,971 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:42,049 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:42.049595', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:42,082 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:45,163 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:45.163823', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:45,188 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:48,279 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:48.279175', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:48,311 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:51,379 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:51.379146', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:51,410 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:54,524 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:54.524969', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:54,567 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:15:57,661 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:15:57.661789', 'error': None, 'mode': 'real'}
+2025-10-02 19:15:57,704 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:00,799 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:00.799087', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:00,830 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:03,916 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:03.916059', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:03,952 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:07,018 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:07.018734', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:07,058 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:10,147 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:10.147249', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:10,176 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:13,261 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:13.261427', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:13,300 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:16,382 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:16.382716', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:16,420 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:19,500 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:19.500069', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:19,541 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:22,616 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:22.616016', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:22,657 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:25,718 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:25.718757', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:25,755 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:28,829 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:28.829394', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:28,874 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:31,963 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:31.963777', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:31,995 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:35,080 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:35.080937', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:35,117 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:38,211 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:38.211432', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:38,249 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:41,315 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:41.315021', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:41,345 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:44,435 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:44.435220', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:44,491 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:47,581 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:47.581386', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:47,628 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:50,700 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:50.700316', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:50,729 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:53,812 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:53.812526', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:53,846 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:16:56,912 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:16:56.912633', 'error': None, 'mode': 'real'}
+2025-10-02 19:16:56,944 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:00,034 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:00.034984', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:00,071 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:03,149 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:03.149097', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:03,178 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:06,262 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:06.262589', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:06,301 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:09,378 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:09.378581', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:09,410 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:12,492 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:12.492218', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:12,529 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:15,614 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:15.614610', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:15,649 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:18,748 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:18.748958', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:18,786 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:21,863 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:21.863517', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:21,899 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:24,980 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:24.980395', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:25,013 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:28,091 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:28.091788', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:28,132 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:31,214 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:31.214497', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:31,265 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:34,348 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:34.348947', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:34,396 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:37,481 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:37.481092', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:37,544 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:40,631 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:40.631479', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:40,677 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:43,767 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:43.767397', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:43,809 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:46,885 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:46.885303', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:46,925 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:50,004 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:50.003582', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:50,051 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:53,164 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:53.164654', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:53,192 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Inicio manual'}
+2025-10-02 19:17:55,864 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:17:55.864146', 'error': None, 'mode': 'real'}
+2025-10-02 19:17:55,906 - AutomationBot - INFO - Ejecutando: Monitorear Precios en Mercado Libre
+2025-10-02 19:18:00,200 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:00.200064', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:00,234 - AutomationBot - INFO - Automatización detenida
+2025-10-02 19:18:00,734 - AutomationBot - INFO - Automatización iniciada: {'platform': 'Dashboard', 'action': 'Reinicio manual'}
+2025-10-02 19:18:17,429 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:17.429102', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:19,532 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:19.532295', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:21,632 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:21.632043', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:23,739 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:23.739741', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:25,830 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:25.830314', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:27,944 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:27.944879', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:30,048 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:30.048859', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:32,159 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:32.159200', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:34,273 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:34.273738', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:36,396 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:36.396189', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:38,475 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:38.475103', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:40,569 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:40.569235', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:42,662 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:42.662457', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:44,757 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:44.757189', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:46,847 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:46.847296', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:48,944 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:48.944190', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:51,028 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:51.028768', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:53,148 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:53.148154', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:55,279 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:55.279224', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:57,351 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:57.351651', 'error': None, 'mode': 'real'}
+2025-10-02 19:18:59,446 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:18:59.446856', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:01,537 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:01.537985', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:03,628 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:03.628584', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:05,743 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:05.743974', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:07,831 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:07.831733', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:09,942 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:09.942335', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:12,059 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:12.059527', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:14,163 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:14.163299', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:16,272 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:16.272207', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:18,366 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:18.366898', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:20,478 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:20.478614', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:22,574 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:22.574426', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:24,678 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:24.678748', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:26,818 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:26.818759', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:28,939 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:28.939540', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:31,048 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:31.048605', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:33,144 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:33.142259', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:35,296 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:35.296044', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:37,414 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:37.414301', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:39,524 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:39.524304', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:41,630 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:41.630713', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:43,743 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:43.743153', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:45,853 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:45.853357', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:47,958 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:47.958912', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:50,095 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:50.095044', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:52,212 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:52.212198', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:54,334 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:54.334606', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:56,446 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:56.446596', 'error': None, 'mode': 'real'}
+2025-10-02 19:19:58,538 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:19:58.538640', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:00,662 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:00.662773', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:02,782 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:02.782736', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:04,880 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:04.880103', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:06,982 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:06.982436', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:09,086 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:09.086126', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:11,180 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:11.180215', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:13,310 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:13.310353', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:15,430 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:15.430727', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:17,555 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:17.555293', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:19,693 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:19.693829', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:21,804 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:21.804109', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:23,931 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:23.931059', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:26,048 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:26.048163', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:28,174 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:28.174796', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:30,272 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:30.272817', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:32,365 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:32.365782', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:34,477 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:34.477095', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:36,582 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:36.582682', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:38,680 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:38.680083', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:40,790 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:40.790396', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:42,909 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:42.909955', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:45,013 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:45.013655', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:47,133 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:47.133154', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:49,247 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:49.247321', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:51,350 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:51.350014', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:53,449 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:53.449287', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:55,554 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:55.554489', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:57,660 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:57.660053', 'error': None, 'mode': 'real'}
+2025-10-02 19:20:59,758 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:20:59.758432', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:01,866 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:01.866775', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:03,991 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:03.991880', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:06,101 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:06.101510', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:08,214 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:08.214205', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:10,319 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:10.319992', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:12,415 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:12.415401', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:14,535 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:14.535900', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:16,649 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:16.649888', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:18,758 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:18.758456', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:20,866 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:20.866442', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:22,966 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:22.966146', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:25,085 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:25.083058', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:27,194 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:27.194058', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:29,292 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:29.292953', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:31,397 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:31.397327', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:33,506 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:33.506543', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:35,596 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:35.596731', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:37,709 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:37.709545', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:39,817 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:39.817699', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:41,941 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:41.941196', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:44,044 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:44.044068', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:46,159 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:46.159344', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:48,263 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:48.262842', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:50,365 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:50.365564', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:52,463 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:52.463976', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:54,556 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:54.556036', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:56,679 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:56.679310', 'error': None, 'mode': 'real'}
+2025-10-02 19:21:58,781 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:21:58.781206', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:00,890 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:00.890763', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:02,992 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:02.992296', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:05,080 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:05.080664', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:07,195 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:07.195778', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:09,324 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:09.324287', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:11,423 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:11.423252', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:13,538 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:13.538340', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:15,645 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:15.645481', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:17,758 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:17.758576', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:19,880 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:19.880834', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:21,993 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:21.993012', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:24,094 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:24.094774', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:26,208 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:26.208852', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:28,310 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:28.310280', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:30,430 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:30.428175', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:32,555 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:32.555850', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:34,663 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:34.663982', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:36,771 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:36.771805', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:38,894 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:38.894863', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:41,011 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:41.011808', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:43,132 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:43.132300', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:45,242 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:45.242562', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:47,350 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:47.350363', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:49,461 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:49.461185', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:51,595 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:51.595278', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:53,724 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:53.724206', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:55,828 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:55.828220', 'error': None, 'mode': 'real'}
+2025-10-02 19:22:57,945 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:22:57.945186', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:00,085 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:00.085277', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:02,209 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:02.209826', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:04,320 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:04.320294', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:06,444 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:06.444761', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:08,555 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:08.555736', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:10,679 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:10.679303', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:12,789 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:12.789382', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:14,897 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:14.897232', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:17,013 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:17.013385', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:19,100 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:19.100599', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:21,197 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:21.197440', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:23,303 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:23.303912', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:25,413 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:25.413177', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:27,508 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:27.508164', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:29,628 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:29.628718', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:31,743 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:31.743096', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:33,851 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:33.851811', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:35,957 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:35.957008', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:38,060 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:38.060498', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:40,149 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:40.149177', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:42,259 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:42.259788', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:44,381 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:44.381490', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:46,507 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:46.507387', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:48,630 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:48.630089', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:50,756 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:50.756987', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:52,877 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:52.877617', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:54,996 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:54.996074', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:57,085 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:57.085151', 'error': None, 'mode': 'real'}
+2025-10-02 19:23:59,213 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:23:59.213893', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:01,334 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:01.334326', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:03,461 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:03.461362', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:05,572 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:05.572010', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:07,711 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:07.711601', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:09,829 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:09.829411', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:11,929 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:11.929668', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:14,045 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:14.045856', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:16,148 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:16.148886', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:18,277 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:18.277606', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:20,396 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:20.396767', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:22,507 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:22.507712', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:24,628 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:24.628868', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:26,741 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:26.741142', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:28,849 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:28.849204', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:30,959 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:30.959938', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:33,094 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:33.094034', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:35,213 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:35.213982', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:37,350 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:37.350803', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:39,477 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:39.477776', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:41,613 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:41.613321', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:43,737 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:43.737926', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:45,862 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:45.862725', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:47,981 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:47.981126', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:50,098 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:50.098646', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:52,210 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:52.210228', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:54,332 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:54.332347', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:56,446 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:56.446730', 'error': None, 'mode': 'real'}
+2025-10-02 19:24:58,554 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:24:58.554583', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:00,690 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:00.690651', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:02,795 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:02.795787', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:04,925 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:04.925423', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:07,047 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:07.047845', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:09,147 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:09.147855', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:11,245 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:11.245953', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:13,350 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:13.350713', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:15,460 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:15.460740', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:17,564 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:17.564207', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:19,679 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:19.679384', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:21,795 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:21.795090', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:23,899 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:23.899643', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:26,006 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:26.006138', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:28,117 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:28.117337', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:30,212 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:30.212158', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:32,336 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:32.336567', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:34,475 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:34.475449', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:36,611 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:36.611699', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:38,726 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:38.726005', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:40,829 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:40.829365', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:42,929 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:42.929062', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:45,053 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:45.053732', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:47,164 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:47.164145', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:49,272 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:49.270945', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:51,380 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:51.380712', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:53,493 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:53.493807', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:55,630 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:55.630246', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:57,756 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:57.756280', 'error': None, 'mode': 'real'}
+2025-10-02 19:25:59,881 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:25:59.881753', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:02,011 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:02.011998', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:04,147 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:04.147335', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:06,278 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:06.278436', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:08,379 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:08.379609', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:10,539 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:10.539912', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:12,646 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:12.646294', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:14,756 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:14.756781', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:16,891 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:16.891721', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:19,031 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:19.031497', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:21,149 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:21.149969', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:23,260 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:23.260790', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:25,380 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:25.380935', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:27,506 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:27.506083', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:29,633 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:29.633462', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:31,745 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:31.745223', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:33,892 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:33.892660', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:35,997 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:35.997420', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:38,100 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:38.100658', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:40,198 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:40.198384', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:42,321 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:42.321406', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:44,460 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:44.460437', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:46,580 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:46.580638', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:48,692 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:48.692996', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:50,812 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:50.812325', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:52,913 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:52.913825', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:55,030 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:55.030608', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:57,124 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:57.124935', 'error': None, 'mode': 'real'}
+2025-10-02 19:26:59,245 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:26:59.245607', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:01,351 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:01.351858', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:03,462 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:03.462238', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:05,589 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:05.589482', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:07,725 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:07.725954', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:09,811 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:09.811276', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:11,897 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:11.897359', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:14,004 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:14.004093', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:16,131 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:16.131969', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:18,243 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:18.243266', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:20,352 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:20.352299', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:22,490 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:22.490778', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:24,628 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:24.628607', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:26,754 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:26.754641', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:28,861 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:28.861313', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:30,974 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:30.974824', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:33,094 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:33.094822', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:35,214 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:35.214874', 'error': None, 'mode': 'real'}
+2025-10-02 19:27:36,893 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:27:36.893397', 'error': None, 'mode': 'real'}
+2025-10-02 19:46:21,391 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:46:21.391349', 'error': None, 'mode': 'real'}
+2025-10-02 19:46:28,421 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:46:28.421279', 'error': None, 'mode': 'real'}
+2025-10-02 19:46:30,509 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:46:30.509805', 'error': None, 'mode': 'real'}
+2025-10-02 19:47:22,975 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:47:22.975661', 'error': None, 'mode': 'real'}
+2025-10-02 19:47:27,187 - AutomationBot - INFO - Ejecutando: Sincronizar HubSpot en Sales Automation
+2025-10-02 19:47:38,007 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:47:38.007150', 'error': None, 'mode': 'real'}
+2025-10-02 19:47:38,221 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:47:38.221361', 'error': None, 'mode': 'real'}
+2025-10-02 19:47:51,716 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:47:51.716616', 'error': None, 'mode': 'real'}
+2025-10-02 19:47:55,876 - AutomationBot - INFO - Ejecutando: Sincronizar HubSpot en Sales Automation
+2025-10-02 19:48:52,571 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:48:52.571083', 'error': None, 'mode': 'real'}
+2025-10-02 19:48:52,805 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:48:52.805571', 'error': None, 'mode': 'real'}
+2025-10-02 19:48:54,915 - AutomationBot - INFO - Ejecutando: Chat con Lead en Sales Automation
+2025-10-02 19:49:11,418 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:49:11.418201', 'error': None, 'mode': 'real'}
+2025-10-02 19:49:40,621 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:49:40.621088', 'error': None, 'mode': 'real'}
+2025-10-02 19:49:40,885 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:49:40.885383', 'error': None, 'mode': 'real'}
+2025-10-02 19:49:42,978 - AutomationBot - INFO - Ejecutando: Chat con Lead en Sales Automation
+2025-10-02 19:49:57,721 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:49:57.721186', 'error': None, 'mode': 'real'}
+2025-10-02 19:50:26,957 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:50:26.957019', 'error': None, 'mode': 'real'}
+2025-10-02 19:50:36,220 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:50:36.220395', 'error': None, 'mode': 'real'}
+2025-10-02 19:50:47,400 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:50:47.400282', 'error': None, 'mode': 'real'}
+2025-10-02 19:51:52,794 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:51:52.794436', 'error': None, 'mode': 'real'}
+2025-10-02 19:52:22,007 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:52:22.007393', 'error': None, 'mode': 'real'}
+2025-10-02 19:52:28,344 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:52:28.344178', 'error': None, 'mode': 'real'}
+2025-10-02 19:52:34,806 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:52:34.806293', 'error': None, 'mode': 'real'}
+2025-10-02 19:52:41,222 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:52:41.222128', 'error': None, 'mode': 'real'}
+2025-10-02 19:52:47,620 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:52:47.620031', 'error': None, 'mode': 'real'}
+2025-10-02 19:52:54,013 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:52:54.013354', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:00,372 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:00.372827', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:06,709 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:06.709364', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:13,053 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:13.053980', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:19,393 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:19.393672', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:25,719 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:25.719540', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:32,053 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:32.053940', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:38,406 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:38.406754', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:44,785 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:44.785489', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:51,149 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:51.149204', 'error': None, 'mode': 'real'}
+2025-10-02 19:53:57,470 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:53:57.470741', 'error': None, 'mode': 'real'}
+2025-10-02 19:54:01,492 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:54:01.492119', 'error': None, 'mode': 'real'}
+2025-10-02 19:54:14,824 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:54:14.824952', 'error': None, 'mode': 'real'}
+2025-10-02 19:54:16,907 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:54:16.907710', 'error': None, 'mode': 'real'}
+2025-10-02 19:56:09,129 - AutomationBot - INFO - Estado conexión FastAPI: {'is_connected': True, 'base_url': 'http://localhost:8000', 'last_check': '2025-10-02T19:56:09.129659', 'error': None, 'mode': 'real'}

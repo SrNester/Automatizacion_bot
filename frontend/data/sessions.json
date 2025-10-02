@@ -31,5 +31,104 @@
     "duration": 12.5,
     "errors": 3,
     "timestamp": "2024-01-15T14:45:00"
+  },
+  {
+    "platform": "Mercado Libre",
+    "action": "Monitorear Precios",
+    "status": "completed",
+    "products_processed": 25,
+    "duration": 45.2,
+    "errors": 0,
+    "config": {
+      "platform": "Mercado Libre",
+      "action": "Monitorear Precios",
+      "mode": "Normal",
+      "priority": "Media",
+      "scheduled": false,
+      "execution_mode": "🏁normal",
+      "timeout": 30,
+      "headless": true,
+      "take_screenshots": true,
+      "save_logs": true
+    },
+    "message": "Monitoreo de precios completado en Mercado Libre",
+    "is_real_data": false,
+    "id": 4,
+    "session_id": "SESSION_0004",
+    "timestamp": "2025-10-02T19:17:58.907260",
+    "created_at": "2025-10-02 19:17:58"
+  },
+  {
+    "platform": "Sales Automation",
+    "action": "Sincronizar HubSpot",
+    "status": "completed",
+    "products_processed": 1,
+    "duration": 4.1,
+    "errors": 0,
+    "config": {
+      "platform": "Sales Automation",
+      "action": "Sincronizar HubSpot",
+      "lead_id": 1
+    },
+    "is_real_data": true,
+    "timestamp": "2025-10-02T19:47:27.192308",
+    "id": 5,
+    "session_id": "SESSION_0005",
+    "created_at": "2025-10-02 19:47:27"
+  },
+  {
+    "platform": "Sales Automation",
+    "action": "Sincronizar HubSpot",
+    "status": "completed",
+    "products_processed": 1,
+    "duration": 4.1,
+    "errors": 0,
+    "config": {
+      "platform": "Sales Automation",
+      "action": "Sincronizar HubSpot"
+    },
+    "is_real_data": true,
+    "timestamp": "2025-10-02T19:47:55.879732",
+    "id": 6,
+    "session_id": "SESSION_0006",
+    "created_at": "2025-10-02 19:47:55"
+  },
+  {
+    "platform": "Sales Automation",
+    "action": "Chat con Lead",
+    "status": "completed",
+    "products_processed": 1,
+    "duration": 3.2,
+    "errors": 0,
+    "config": {
+      "platform": "Sales Automation",
+      "action": "Chat con Lead",
+      "lead_id": 1,
+      "message": "hola, quisiera saber sobre una propiedad\n"
+    },
+    "is_real_data": true,
+    "timestamp": "2025-10-02T19:48:54.925000",
+    "id": 7,
+    "session_id": "SESSION_0007",
+    "created_at": "2025-10-02 19:48:54"
+  },
+  {
+    "platform": "Sales Automation",
+    "action": "Chat con Lead",
+    "status": "completed",
+    "products_processed": 1,
+    "duration": 3.2,
+    "errors": 0,
+    "config": {
+      "platform": "Sales Automation",
+      "action": "Chat con Lead",
+      "lead_id": 1,
+      "message": "donde puedo ver las propiedades\n"
+    },
+    "is_real_data": true,
+    "timestamp": "2025-10-02T19:49:42.983555",
+    "id": 8,
+    "session_id": "SESSION_0008",
+    "created_at": "2025-10-02 19:49:42"
   }
 ]
