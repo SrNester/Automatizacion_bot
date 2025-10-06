@@ -1,4 +1,3 @@
-# backend_fix.py
 import os
 import uvicorn
 from fastapi import FastAPI

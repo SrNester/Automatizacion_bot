@@ -4,21 +4,21 @@ from sqlalchemy.orm import Session
 from typing import Dict, Any, List
 import logging
 
-from .models.integration import Lead
-from .services.integrations import hubspot_service
-from .core.database import get_db
-from .services.lead_scoring import LeadScoringService
-from .services.ai_assistant import AIAssistant, get_conversation_history
-from .services.nurturing import NurturingService
-from .services.lead_service import (
+from models.integration import Lead
+from services.integrations import hubspot_service
+from core.database import get_db
+from services.lead_scoring import LeadScoringService
+from services.ai_assistant import AIAssistant, get_conversation_history
+from services.nurturing import NurturingService
+from services.lead_service import (
     calculate_conversion_rate, get_hot_leads_count, get_lead, 
     get_top_lead_sources, get_total_leads, lead_dict, 
     create_lead, save_interaction, get_interactions,
     update_lead_score
 )
-from .api.dashboard import router as dashboard_router
-from .api.reports import router as reports_router
-from .api.webhooks import router as webhooks_router
+from api.dashboard import router as dashboard_router
+from api.reports import router as reports_router
+from api.webhooks import router as webhooks_router
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)

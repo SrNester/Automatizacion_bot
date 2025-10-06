@@ -1,238 +1,109 @@
-# run_dashboard.py - VERSIÓN ACTUALIZADA
-import os
-import sys
-import subprocess
-import webbrowser
-import time
-import json
-from pathlib import Path
+# components/metrics.py - VERSIÓN CORREGIDA
+import streamlit as st
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+import pandas as pd
+from datetime import datetime, timedelta
 
-def check_python_version():
-    """Verificar versión de Python"""
-    version = sys.version_info
-    if version.major < 3 or (version.major == 3 and version.minor < 8):
-        print("❌ Se requiere Python 3.8 o superior")
-        print(f"   Versión actual: {sys.version}")
-        return False
-    print(f"✅ Python {version.major}.{version.minor}.{version.micro} - Compatible")
-    return True
-
-def create_directory_structure():
-    """Crear estructura completa de directorios"""
-    print("\n📁 Creando estructura de directorios...")
+def render_metrics(session_manager):
+    """Renderizar las métricas principales del dashboard"""
+    st.subheader("📊 Métricas de Rendimiento")
     
-    directories = [
-        'config',
-        'components', 
-        'core',
-        'utils',
-        'data',
-        'logs',
-        'static/css',
-        'static/images',
-        'static/js',
-        'tests',
-        'exports',
-        'backups'
-    ]
+    # Obtener estadísticas con valores por defecto
+    stats = session_manager.get_statistics()
     
-    for directory in directories:
-        Path(directory).mkdir(parents=True, exist_ok=True)
-        print(f"   ✅ {directory}/")
-
-def create_default_configs():
-    """Crear archivos de configuración por defecto"""
-    print("\n⚙️ Creando configuraciones por defecto...")
-    
-    # Configuración del dashboard
-    dashboard_config = {
-        "ui": {
-            "theme": "light",
-            "language": "es",
-            "refresh_interval": 30,
-            "default_view": "dashboard"
-        },
-        "automation": {
-            "default_timeout": 30,
-            "max_retries": 3,
-            "headless_mode": True,
-            "screenshot_on_error": True,
-            "notifications": True
-        },
-        "backend": {
-            "fastapi_url": "http://localhost:8000",
-            "timeout": 10,
-            "auto_retry": True
-        },
-        "performance": {
-            "max_concurrent_sessions": 5,
-            "session_timeout": 3600,
-            "data_retention_days": 30
-        }
+    # Asegurar que todas las claves necesarias existen
+    safe_stats = {
+        "total_sessions": stats.get("total_sessions", 0),
+        "success_rate": stats.get("success_rate", 0),
+        "total_products": stats.get("total_products", 0),
+        "avg_time": stats.get("avg_time", 0),
+        "sessions_today": stats.get("sessions_today", 0)
     }
     
-    config_files = {
-        'config/dashboard_config.json': dashboard_config,
-        'data/sessions.json': [],
-        'data/user_preferences.json': {
-            "notifications": True,
-            "auto_save": True,
-            "default_platform": "Sales Automation",
-            "timezone": "America/Mexico_City"
-        }
-    }
+    # Crear 4 columnas para las métricas
+    col1, col2, col3, col4 = st.columns(4)
     
-    for file_path, config in config_files.items():
-        if not os.path.exists(file_path):
-            with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(config, f, indent=2, ensure_ascii=False)
-            print(f"   ✅ {file_path}")
+    with col1:
+        render_metric_card(
+            title="Sesiones Totales",
+            value=safe_stats["total_sessions"],
+            delta=safe_stats["sessions_today"],
+            delta_label="hoy",
+            icon="📈",
+            color="#1f77b4",
+            help_text="Total de sesiones de automatización ejecutadas"
+        )
+    
+    with col2:
+        render_metric_card(
+            title="Tasa de Éxito", 
+            value=f"{safe_stats['success_rate']:.1f}%",
+            delta=2.5,
+            delta_label="vs. ayer",
+            icon="✅",
+            color="#28a745",
+            help_text="Porcentaje de sesiones completadas exitosamente"
+        )
+    
+    with col3:
+        render_metric_card(
+            title="Productos Procesados",
+            value=safe_stats["total_products"],
+            delta=127,
+            delta_label="últimas 24h",
+            icon="📦", 
+            color="#ff7f0e",
+            help_text="Total de productos procesados por las automatizaciones"
+        )
+    
+    with col4:
+        render_metric_card(
+            title="Tiempo Promedio",
+            value=f"{safe_stats['avg_time']:.1f}s",
+            delta=-3.2,
+            delta_label="mejoría",
+            icon="⏱️",
+            color="#dc3545",
+            help_text="Tiempo promedio de ejecución por sesión"
+        )
 
-def check_backend_availability():
-    """Verificar disponibilidad del backend FastAPI"""
-    print("\n🔗 Verificando backend FastAPI...")
+def render_metric_card(title, value, delta, delta_label, icon, color, help_text):
+    """Renderizar una tarjeta de métrica individual"""
     
-    try:
-        import requests
-        response = requests.get('http://localhost:8000/health', timeout=5)
-        if response.status_code == 200:
-            print("   ✅ Backend FastAPI detectado y funcionando")
-            return True
+    # Determinar color del delta
+    delta_color = ""
+    delta_prefix = ""
+    if isinstance(delta, (int, float)):
+        if delta > 0:
+            delta_color = "color: #28a745;"
+            delta_prefix = "↑"
+        elif delta < 0:
+            delta_color = "color: #dc3545;"
+            delta_prefix = "↓"
         else:
-            print(f"   ⚠️ Backend respondió con código: {response.status_code}")
-            return False
-    except requests.exceptions.ConnectionError:
-        print("   ❌ Backend FastAPI no disponible")
-        print("   💡 Ejecuta: python main.py (en tu proyecto FastAPI)")
-        return False
-    except Exception as e:
-        print(f"   ⚠️ Error verificando backend: {e}")
-        return False
-
-def install_dependencies():
-    """Instalar dependencias requeridas"""
-    print("\n📦 Instalando dependencias...")
+            delta_color = "color: #6c757d;"
+            delta_prefix = "→"
     
-    try:
-        # Verificar si requirements existe
-        if not os.path.exists('requirements_frontend.txt'):
-            print("   ❌ requirements_frontend.txt no encontrado")
-            return False
-        
-        # Instalar dependencias
-        result = subprocess.run([
-            sys.executable, "-m", "pip", "install", "-r", "requirements_frontend.txt"
-        ], capture_output=True, text=True)
-        
-        if result.returncode == 0:
-            print("   ✅ Dependencias instaladas exitosamente")
-            return True
-        else:
-            print(f"   ❌ Error instalando dependencias: {result.stderr}")
-            return False
-            
-    except Exception as e:
-        print(f"   ❌ Error durante instalación: {e}")
-        return False
-
-def setup_environment():
-    """Configurar el entorno completo"""
-    print("🚀 CONFIGURACIÓN DEL SALES AUTOMATION DASHBOARD")
-    print("=" * 60)
+    delta_display = f"{delta_prefix}{abs(delta)}" if isinstance(delta, (int, float)) else delta
     
-    # Verificar Python
-    if not check_python_version():
-        return False
-    
-    # Crear directorios
-    create_directory_structure()
-    
-    # Crear configuraciones
-    create_default_configs()
-    
-    # Verificar backend
-    backend_available = check_backend_availability()
-    
-    if not backend_available:
-        print("\n⚠️  El backend FastAPI no está disponible")
-        print("   El dashboard funcionará en modo demostración")
-    
-    # Instalar dependencias
-    if not install_dependencies():
-        print("\n⚠️  Algunas dependencias fallaron. Continuando...")
-    
-    return True
-
-def start_dashboard():
-    """Iniciar el dashboard de Streamlit"""
-    print("\n🌐 INICIANDO DASHBOARD...")
-    print("=" * 60)
-    
-    # Información para el usuario
-    print("""
-    📍 El dashboard estará disponible en:
-       http://localhost:8501
-    
-    🔗 Estado del Backend:
-       - FastAPI: {} 
-    
-    ⚠️  IMPORTANTE:
-       - Mantén esta terminal abierta
-       - Presiona Ctrl+C para detener el servidor
-       - La página se abrirá automáticamente en tu navegador
-    
-    🕐 Iniciando en 3 segundos...
-    """.format("✅ Conectado" if check_backend_availability() else "❌ No conectado"))
-    
-    # Esperar antes de abrir navegador
-    time.sleep(3)
-    
-    # Abrir navegador automáticamente
-    try:
-        webbrowser.open("http://localhost:8501")
-    except Exception as e:
-        print(f"   ⚠️  No se pudo abrir el navegador automáticamente: {e}")
-        print("   📱 Por favor abre manualmente: http://localhost:8501")
-    
-    # Ejecutar Streamlit
-    try:
-        subprocess.run([
-            sys.executable, "-m", "streamlit", "run", "app.py",
-            "--server.port=8501", 
-            "--server.address=localhost",
-            "--browser.serverAddress=localhost",
-            "--server.headless=true",
-            "--theme.primaryColor=#1f77b4",
-            "--theme.backgroundColor=#ffffff",
-            "--theme.secondaryBackgroundColor=#f0f2f6",
-            "--theme.textColor=#31333f"
-        ])
-    except KeyboardInterrupt:
-        print("\n🛑 Dashboard detenido por el usuario")
-    except Exception as e:
-        print(f"❌ Error al iniciar el dashboard: {e}")
-        return False
-    
-    return True
-
-def main():
-    """Función principal"""
-    try:
-        # Configurar entorno
-        if not setup_environment():
-            print("\n❌ La configuración falló. Por favor revisa los errores.")
-            return
-        
-        # Iniciar dashboard
-        start_dashboard()
-        
-    except Exception as e:
-        print(f"\n💥 Error crítico: {e}")
-        print("\n🔧 Solución de problemas:")
-        print("   1. Verifica que Python 3.8+ esté instalado")
-        print("   2. Asegúrate de tener permisos de escritura")
-        print("   3. Para backend real: ejecuta tu FastAPI en puerto 8000")
-        print("   4. Ejecuta como administrador si es necesario")
-
-if __name__ == "__main__":
-    main()
+    st.markdown(
+        f"""
+        <div class="metric-card" style="border-left-color: {color};" title="{help_text}">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">{icon}</div>
+                <div style="font-size: 0.8rem; background: {color}20; color: {color}; 
+                          padding: 2px 8px; border-radius: 12px; font-weight: bold;">
+                    {delta_display}
+                </div>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: {color}; margin-bottom: 0.5rem;">
+                {value}
+            </div>
+            <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">{title}</div>
+            <div style="font-size: 0.7rem; {delta_color}">{delta_label}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )

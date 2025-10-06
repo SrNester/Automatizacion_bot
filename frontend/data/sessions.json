@@ -149,5 +149,41 @@
     "id": 9,
     "session_id": "SESSION_0009",
     "created_at": "2025-10-02 20:35:48"
+  },
+  {
+    "platform": "Sales Automation",
+    "action": "Sincronizar HubSpot",
+    "status": "completed",
+    "products_processed": 19,
+    "duration": 43.16621949198477,
+    "errors": 1,
+    "config": {
+      "platform": "Sales Automation",
+      "action": "Sincronizar HubSpot"
+    },
+    "is_real_data": false,
+    "timestamp": "2025-10-06T17:37:23.541695",
+    "id": 10,
+    "session_id": "SESSION_0010",
+    "created_at": "2025-10-06 17:37:23"
+  },
+  {
+    "platform": "Sales Automation",
+    "action": "Chat con Lead",
+    "status": "completed",
+    "products_processed": 1,
+    "duration": 3.2,
+    "errors": 0,
+    "config": {
+      "platform": "Sales Automation",
+      "action": "Chat con Lead",
+      "lead_id": 1,
+      "message": "Hola\n"
+    },
+    "is_real_data": true,
+    "timestamp": "2025-10-06T17:40:12.834746",
+    "id": 11,
+    "session_id": "SESSION_0011",
+    "created_at": "2025-10-06 17:40:12"
   }
 ]

@@ -1,0 +1,25 @@
+{
+  "ui": {
+    "theme": "light",
+    "language": "es",
+    "refresh_interval": 30,
+    "default_view": "dashboard"
+  },
+  "automation": {
+    "default_timeout": 30,
+    "max_retries": 3,
+    "headless_mode": true,
+    "screenshot_on_error": true,
+    "notifications": true
+  },
+  "backend": {
+    "fastapi_url": "http://localhost:8000",
+    "timeout": 10,
+    "auto_retry": true
+  },
+  "performance": {
+    "max_concurrent_sessions": 5,
+    "session_timeout": 3600,
+    "data_retention_days": 30
+  }
+}
