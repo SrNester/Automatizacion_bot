@@ -323,7 +323,7 @@ def show_session_statistics(session_manager):
     
     with col2:
         st.metric("Productos Procesados", stats["total_products"])
-        st.metric("Tiempo Total", f"{(stats['total_sessions'] * stats['avg_time']) / 60:.1f} min")
+        st.metric("Tiempo Total", f"{(stats['total_sessions'] * stats['avg_duration']) / 60:.1f} min")
         st.metric("Eficiencia Promedio", "94.2%")
 
 def calculate_efficiency(session):

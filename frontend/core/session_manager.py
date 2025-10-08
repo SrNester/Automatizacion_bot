@@ -200,10 +200,16 @@ class SessionManager:
             
             # Sesiones de hoy
             today = datetime.now().date()
-            sessions_today = len([
-                s for s in self.sessions 
-                if datetime.fromisoformat(s['timestamp'].replace('Z', '+00:00')).date() == today
-            ])
+            sessions_today = 0
+            for session in self.sessions:
+                try:
+                    if 'timestamp' in session:
+                        timestamp_str = session['timestamp'].replace('Z', '+00:00')
+                        session_date = datetime.fromisoformat(timestamp_str).date()
+                        if session_date == today:
+                            sessions_today += 1
+                except (ValueError, KeyError, AttributeError):
+                    continue
             
             return {
                 'total_sessions': total_sessions,
@@ -213,13 +219,14 @@ class SessionManager:
                 'success_rate': round(success_rate, 2),
                 'total_products': total_products,
                 'avg_duration': round(avg_duration, 2),
+                'avg_time': round(avg_duration, 2),
                 'sessions_today': sessions_today,
                 'platforms_distribution': platforms,
                 'last_updated': datetime.now().isoformat()
             }
             
         except Exception as e:
-            self.logger.error(f"Error calculando estadísticas: {e}")
+            self.logger.error(f"Error calculando estadísticas: {str(e)}")
             return self._get_empty_statistics()
     
     def _get_empty_statistics(self) -> Dict[str, Any]:
@@ -232,6 +239,7 @@ class SessionManager:
             'success_rate': 0,
             'total_products': 0,
             'avg_duration': 0,
+            'avg_time': 0.0,
             'sessions_today': 0,
             'platforms_distribution': {},
             'last_updated': datetime.now().isoformat()
