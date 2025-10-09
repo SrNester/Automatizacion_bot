@@ -515,4 +515,4 @@ if __name__ == "__main__":
     print("⏹️  Presiona Ctrl+C para detener el servidor")
     print("=" * 50)
     
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=8080, log_level="info")
