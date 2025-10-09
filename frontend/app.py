@@ -507,9 +507,9 @@ async def get_all_leads():
 if __name__ == "__main__":
     print("🚀 INICIANDO BACKEND DE DEMOSTRACIÓN...")
     print("=" * 50)
-    print("📊 API Demo disponible en: http://localhost:8000")
-    print("📚 Documentación en: http://localhost:8000/docs")
-    print("❤️  Health check en: http://localhost:8000/health")
+    print("📊 API Demo disponible en: http://localhost:8080")
+    print("📚 Documentación en: http://localhost:8080/docs")
+    print("❤️  Health check en: http://localhost:8080/health")
     print("=" * 50)
     print("🖥️  Frontend disponible en: http://localhost:8501")
     print("⏹️  Presiona Ctrl+C para detener el servidor")
