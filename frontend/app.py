@@ -209,7 +209,7 @@ class AutomationDashboard:
         with st.form("backend_config_form"):
             backend_url = st.text_input(
                 "URL del Backend FastAPI",
-                value="http://localhost:8080",
+                value="http://localhost:8081",
                 help="URL donde está ejecutándose tu servidor FastAPI"
             )
             
@@ -507,12 +507,12 @@ async def get_all_leads():
 if __name__ == "__main__":
     print("🚀 INICIANDO BACKEND DE DEMOSTRACIÓN...")
     print("=" * 50)
-    print("📊 API Demo disponible en: http://localhost:8080")
-    print("📚 Documentación en: http://localhost:8080/docs")
-    print("❤️  Health check en: http://localhost:8080/health")
+    print("📊 API Demo disponible en: http://localhost:8081")
+    print("📚 Documentación en: http://localhost:8081/docs")
+    print("❤️  Health check en: http://localhost:8081/health")
     print("=" * 50)
     print("🖥️  Frontend disponible en: http://localhost:8501")
     print("⏹️  Presiona Ctrl+C para detener el servidor")
     print("=" * 50)
     
-    uvicorn.run(app, host="0.0.0.0", port=8080, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=8081, log_level="info")
