@@ -209,7 +209,7 @@ class AutomationDashboard:
         with st.form("backend_config_form"):
             backend_url = st.text_input(
                 "URL del Backend FastAPI",
-                value="http://localhost:8000",
+                value="http://localhost:8080",
                 help="URL donde está ejecutándose tu servidor FastAPI"
             )
             
