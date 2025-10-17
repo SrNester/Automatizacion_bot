@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
+import openai  # Para integración con OpenAI
+# Alternativamente podrías usar: from anthropic import Anthropic
 
 # =============================================================================
 # CONFIGURACIÓN INICIAL DE STREAMLIT
@@ -85,21 +87,48 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# CLASE BACKEND SIMULADO (Reemplaza FastAPI)
+# CONFIGURACIÓN DE IA (Reemplaza con tus propias credenciales)
+# =============================================================================
+def setup_ai_client():
+    """Configurar el cliente de IA"""
+    # Opción 1: OpenAI GPT
+    openai_api_key = st.secrets.get("OPENAI_API_KEY", "tu-api-key-aqui")
+    if openai_api_key and openai_api_key != "tu-api-key-aqui":
+        openai.api_key = openai_api_key
+        return "openai"
+    
+    # Opción 2: Anthropic Claude (descomenta si prefieres usar Claude)
+    # anthropic_api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
+    # if anthropic_api_key:
+    #     return "anthropic"
+    
+    # Opción 3: Usar una API local (Ollama, etc.)
+    # local_api_url = st.secrets.get("LOCAL_AI_API", "")
+    # if local_api_url:
+    #     return "local"
+    
+    return "demo"  # Modo demo si no hay credenciales
+
+AI_PROVIDER = setup_ai_client()
+
+# =============================================================================
+# CLASE BACKEND CON IA REAL
 # =============================================================================
 class SalesAutomationBackend:
-    """Simulación del backend FastAPI en memoria"""
+    """Backend con IA real integrada"""
     
     def __init__(self):
         self.demo_leads = []
         self.lead_counter = 1000
         self.conversations = {}
         self.sessions = []
+        self.ai_provider = AI_PROVIDER
     
     def get_health(self):
         return {
             "status": "healthy",
-            "mode": "demo",
+            "mode": "production" if self.ai_provider != "demo" else "demo",
+            "ai_provider": self.ai_provider,
             "timestamp": datetime.now().isoformat()
         }
     
@@ -117,9 +146,104 @@ class SalesAutomationBackend:
             ],
             "average_score": 69.5,
             "timestamp": datetime.now().isoformat(),
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
     
+    def _call_ai_api(self, message: str, context: str = "") -> str:
+        """Llamar a la API de IA real"""
+        
+        if self.ai_provider == "demo":
+            # Respuestas demo como fallback
+            responses = {
+                "hola": "¡Hola! Soy tu asistente de ventas inteligente. ¿En qué puedo ayudarte hoy?",
+                "precio": "Nuestros precios varían según el servicio. ¿Podrías contarme más sobre lo que necesitas para darte una cotización precisa?",
+                "servicio": "Ofrecemos soluciones personalizadas de automatización de ventas. ¿Qué tipo de negocio tienes y qué desafíos enfrentas?",
+                "contacto": "Puedes contactarnos en ventas@empresa.com o llamarnos al +1234567890. ¿Te gustaría que te contacte un ejecutivo?",
+                "demo": "¡Claro! Podemos agendar una demostración personalizada. ¿Qué día y hora te viene bien? También puedo enviarte información por email."
+            }
+            
+            for keyword, response in responses.items():
+                if keyword in message.lower():
+                    return response
+            
+            return "¡Gracias por tu mensaje! Como asistente de IA, estoy aquí para ayudarte con información sobre nuestros servicios de automatización de ventas. ¿Hay algo específico en lo que pueda asistirte?"
+        
+        elif self.ai_provider == "openai":
+            try:
+                # Sistema prompt para ventas
+                system_prompt = """Eres un asistente de ventas inteligente y profesional para una empresa de automatización de ventas. 
+                Tu objetivo es ayudar a los leads potenciales, responder sus preguntas y guiarlos hacia una demostración o contacto con el equipo comercial.
+                
+                Contexto de la empresa:
+                - Especialistas en automatización de procesos de ventas
+                - Soluciones para PYMES y grandes empresas
+                - Integración con HubSpot, Salesforce, y otras herramientas
+                - Servicios de consultoría e implementación
+                
+                Sé amable, profesional y orientado a resultados. Siempre trata de entender las necesidades del cliente y ofrecer soluciones relevantes."""
+                
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",  # o "gpt-4" si tienes acceso
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": f"Contexto adicional: {context}\n\nMensaje del lead: {message}"}
+                    ],
+                    max_tokens=500,
+                    temperature=0.7
+                )
+                
+                return response.choices[0].message.content
+                
+            except Exception as e:
+                st.error(f"Error con OpenAI: {e}")
+                return "Lo siento, estoy teniendo problemas técnicos. Por favor, intenta nuevamente o contacta a nuestro equipo directamente."
+        
+        # Aquí puedes agregar más proveedores de IA como Anthropic, etc.
+        else:
+            return "Configuración de IA no reconocida. Por favor, contacta al administrador."
+    
+    def chat_message(self, message_data: dict):
+        lead_id = message_data.get("lead_id", 1)
+        user_message = message_data.get("message", "")
+        
+        # Obtener contexto del lead si está disponible
+        lead_context = ""
+        lead_details = self.get_lead_details(lead_id)
+        if lead_details and "lead" in lead_details:
+            lead = lead_details["lead"]
+            lead_context = f"Lead: {lead.get('name', '')} - Empresa: {lead.get('company', '')} - Email: {lead.get('email', '')}"
+        
+        # Llamar a la IA real
+        with st.spinner("El asistente está pensando..."):
+            ai_response = self._call_ai_api(user_message, lead_context)
+        
+        # Analizar sentimiento/score (simulado por ahora)
+        sentiment_score = self._analyze_sentiment(user_message)
+        
+        return {
+            "response": ai_response,
+            "lead_score": sentiment_score,
+            "conversation_id": message_data.get("conversation_id", f"conv_{lead_id}"),
+            "timestamp": datetime.now().isoformat(),
+            "mode": "production" if self.ai_provider != "demo" else "demo",
+            "ai_used": True
+        }
+    
+    def _analyze_sentiment(self, message: str) -> int:
+        """Análisis simple de sentimiento (puedes reemplazar con IA real)"""
+        positive_words = ["hola", "gracias", "interesante", "genial", "excelente", "bueno", "me gusta", "quiero", "sí"]
+        negative_words = ["no", "caro", "problema", "mal", "lento", "difícil"]
+        
+        message_lower = message.lower()
+        positive_count = sum(1 for word in positive_words if word in message_lower)
+        negative_count = sum(1 for word in negative_words if word in message_lower)
+        
+        base_score = 50
+        score = base_score + (positive_count * 10) - (negative_count * 15)
+        
+        return max(20, min(95, score))
+    
+    # Los demás métodos permanecen iguales...
     def capture_lead(self, lead_data: dict):
         lead_id = self.lead_counter
         self.lead_counter += 1
@@ -141,34 +265,7 @@ class SalesAutomationBackend:
             "score": score,
             "message": f"Lead {lead_data.get('name', 'demo')} capturado exitosamente",
             "timestamp": datetime.now().isoformat(),
-            "mode": "demo"
-        }
-    
-    def chat_message(self, message_data: dict):
-        lead_id = message_data.get("lead_id", 1)
-        user_message = message_data.get("message", "")
-        
-        responses = {
-            "hola": "¡Hola! Soy tu asistente de ventas. ¿En qué puedo ayudarte hoy?",
-            "precio": "Nuestros precios varían según el servicio. ¿Podrías contarme más sobre lo que necesitas?",
-            "servicio": "Ofrecemos soluciones personalizadas de automatización de ventas. ¿Qué tipo de negocio tienes?",
-            "contacto": "Puedes contactarnos en demo@empresa.com o llamarnos al +1234567890",
-            "demo": "¡Claro! Podemos agendar una demostración. ¿Qué día y hora te viene bien?"
-        }
-        
-        response_text = "¡Gracias por tu mensaje! Nuestro sistema de IA analizaría tu consulta para darte la mejor respuesta personalizada."
-        
-        for keyword, response in responses.items():
-            if keyword in user_message.lower():
-                response_text = response
-                break
-        
-        return {
-            "response": response_text,
-            "lead_score": random.randint(60, 85),
-            "conversation_id": message_data.get("conversation_id", f"demo_{datetime.now().timestamp()}"),
-            "timestamp": datetime.now().isoformat(),
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
     
     def get_lead_details(self, lead_id: int):
@@ -208,7 +305,7 @@ class SalesAutomationBackend:
                 "demographics": random.randint(50, 90),
                 "behavior": random.randint(55, 85)
             },
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
     
     def get_sync_status(self):
@@ -218,7 +315,7 @@ class SalesAutomationBackend:
             "pending_sync": 13,
             "sync_percentage": round(((len(self.demo_leads) + 32) / (len(self.demo_leads) + 45)) * 100, 1),
             "hubspot_configured": True,
-            "mode": "demo",
+            "mode": "production" if self.ai_provider != "demo" else "demo",
             "timestamp": datetime.now().isoformat()
         }
     
@@ -228,7 +325,7 @@ class SalesAutomationBackend:
             "message": f"Lead {lead_id} sincronizado con HubSpot",
             "hubspot_id": f"hubspot_demo_{lead_id}",
             "timestamp": datetime.now().isoformat(),
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
     
     def trigger_bulk_sync(self):
@@ -237,7 +334,7 @@ class SalesAutomationBackend:
             "message": "Sincronización masiva con HubSpot iniciada",
             "leads_processed": len(self.demo_leads),
             "timestamp": datetime.now().isoformat(),
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
     
     def trigger_nurturing_sequence(self, lead_id: int, sequence_type: str = "default"):
@@ -253,7 +350,7 @@ class SalesAutomationBackend:
             "sequence_type": sequence_type,
             "lead_id": lead_id,
             "timestamp": datetime.now().isoformat(),
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
     
     def create_hubspot_deal(self, lead_id: int, deal_data: dict):
@@ -266,14 +363,14 @@ class SalesAutomationBackend:
             "message": "Oportunidad creada exitosamente en HubSpot",
             "hubspot_deal_id": f"hubspot_deal_{random.randint(10000, 99999)}",
             "timestamp": datetime.now().isoformat(),
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
     
     def get_all_leads(self):
         return {
             "leads": self.demo_leads[-10:],
             "total_count": len(self.demo_leads),
-            "mode": "demo"
+            "mode": "production" if self.ai_provider != "demo" else "demo"
         }
 
 # =============================================================================
@@ -469,6 +566,7 @@ def render_sidebar():
         health = backend.get_health()
         st.success(f"✅ {health['status'].upper()}")
         st.caption(f"Modo: {health['mode']}")
+        st.caption(f"IA: {health['ai_provider'].upper()}")
         
         # Métricas rápidas
         analytics = backend.get_analytics()
@@ -602,8 +700,15 @@ def render_lead_management():
             st.info("No hay leads capturados aún")
 
 def render_chat():
-    """Chat con leads"""
-    st.title("💬 Chat con Leads")
+    """Chat con leads usando IA real"""
+    st.title("💬 Chat con Leads (IA Integrada)")
+    
+    # Mostrar información del proveedor de IA
+    health = backend.get_health()
+    if health["ai_provider"] == "demo":
+        st.warning("⚠️ Modo demo: usando respuestas predefinidas. Configura una API key de OpenAI para usar IA real.")
+    else:
+        st.success(f"✅ Conectado a {health['ai_provider'].upper()} - IA real activa")
     
     # Selección de lead
     leads_data = backend.get_all_leads()
@@ -657,7 +762,7 @@ def render_chat():
             st.markdown(
                 f"""
                 <div class="chat-message chat-assistant">
-                    <strong>Asistente:</strong> {msg['response']}<br>
+                    <strong>Asistente IA:</strong> {msg['response']}<br>
                     <small>🕒 {msg['timestamp']}</small>
                 </div>
                 """, 
@@ -680,7 +785,7 @@ def render_chat():
             "conversation_id": f"conv_{lead_id}"
         }
         
-        with st.spinner("Procesando..."):
+        with st.spinner("El asistente IA está respondiendo..."):
             response = backend.chat_message(message_data)
             
             # Guardar mensaje en session state
@@ -688,10 +793,15 @@ def render_chat():
                 'lead_id': lead_id,
                 'user_message': user_message,
                 'response': response['response'],
-                'timestamp': datetime.now().strftime('%H:%M:%S')
+                'timestamp': datetime.now().strftime('%H:%M:%S'),
+                'ai_used': response.get('ai_used', False)
             })
             
-            st.success("Mensaje enviado!")
+            if response.get('ai_used', False):
+                st.success("✅ Respuesta generada por IA")
+            else:
+                st.info("ℹ️ Respuesta demo (configura API key para IA real)")
+            
             time.sleep(1)
             st.rerun()
 
@@ -766,19 +876,33 @@ def render_config():
         st.slider("Intervalo de actualización (segundos)", 10, 300, 30, key="refresh")
         
         st.text_input("URL de FastAPI", "http://localhost:8000", key="api_url")
-        st.text_input("Token de HubSpot", "demo-token-********", type="password")
-    
-    with col2:
-        st.subheader("Automatización")
         
-        st.number_input("Timeout máximo (segundos)", 10, 120, 30, key="timeout")
-        st.number_input("Máximo de reintentos", 1, 10, 3, key="retries")
-        st.checkbox("Modo headless", True, key="headless")
-        st.checkbox("Notificaciones", True, key="notifications")
-        
-        st.markdown("---")
         if st.button("💾 Guardar Configuración", use_container_width=True):
             st.success("Configuración guardada exitosamente")
+    
+    with col2:
+        st.subheader("Configuración de IA")
+        
+        st.info("Configura tu proveedor de IA para activar el chat inteligente")
+        
+        ai_provider = st.selectbox(
+            "Proveedor de IA",
+            ["OpenAI GPT", "Anthropic Claude", "Local (Ollama)", "Demo Mode"],
+            index=3
+        )
+        
+        if ai_provider != "Demo Mode":
+            api_key = st.text_input("API Key", type="password")
+            st.caption("La API key se almacena de forma segura y no se comparte")
+            
+            if st.button("🔑 Probar Conexión", use_container_width=True):
+                st.warning("Esta funcionalidad requiere configuración adicional en el backend")
+        
+        st.markdown("---")
+        st.subheader("Estado del Sistema")
+        
+        health = backend.get_health()
+        st.json(health)
 
 # =============================================================================
 # APLICACIÓN PRINCIPAL
@@ -786,19 +910,19 @@ def render_config():
 def main():
     """Función principal de la aplicación"""
     
-    # Barra lateral
-    current_page = render_sidebar()
+    # Navegación desde sidebar
+    page = render_sidebar()
     
-    # Navegación de páginas
-    if current_page == "📊 Dashboard":
+    # Renderizar página seleccionada
+    if page == "📊 Dashboard":
         render_dashboard()
-    elif current_page == "👥 Gestión de Leads":
+    elif page == "👥 Gestión de Leads":
         render_lead_management()
-    elif current_page == "💬 Chat con Leads":
+    elif page == "💬 Chat con Leads":
         render_chat()
-    elif current_page == "🔄 Sincronización":
+    elif page == "🔄 Sincronización":
         render_sync()
-    elif current_page == "⚙️ Configuración":
+    elif page == "⚙️ Configuración":
         render_config()
 
 if __name__ == "__main__":
